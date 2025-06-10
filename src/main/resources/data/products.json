@@ -1,0 +1,199 @@
+[
+  {
+    "productId": "AETHER-CORE-15",
+    "productName": "AetherTech Core 15 Pro Laptop",
+    "manufacturer": "AetherTech",
+    "category": "High-Performance Laptop",
+    "price": 1899.99,
+    "currency": "USD",
+    "thumbnailUrl": "https://ezcart.com/images/aethercore15-thumb.jpg",
+    "fullImageUrl": "https://ezcart.com/images/aethercore15-full.jpg",
+    "shortDescription": "Premium 15-inch powerhouse for creative professionals and demanding users.",
+    "longDescription": "The AetherTech Core 15 Pro features a stunning Edge-to-Edge OLED display, latest-gen Intel Core processors, and powerful discrete graphics, making it ideal for video editing, graphic design, and intensive productivity tasks. Its sleek unibody design ensures durability and style.",
+    "specifications": {
+      "processor": "Intel Core i7-13700H (14-core)",
+      "graphicsCard": "NVIDIA GeForce RTX 4060 8GB GDDR6",
+      "ram": "32GB DDR5 4800MHz",
+      "storage": "1TB PCIe Gen4 NVMe SSD",
+      "display": "15.6-inch OLED, 3.5K (3456 x 2160), Touch, 400 nits, 100% DCI-P3",
+      "batteryLifeHours": 10,
+      "weightKg": 1.92,
+      "ports": ["2x Thunderbolt 4 (USB-C)", "1x USB 3.2 Gen 2 Type-C", "SD Card Reader", "Headphone Jack"],
+      "operatingSystem": "QuantumOS 11 Home",
+      "webcam": "1080p FHD"
+    },
+    "features": [
+      "Edge-to-Edge OLED Display",
+      "Precision-milled aluminum chassis",
+      "Ultra-responsive Trackpad",
+      "Spatial Audio",
+      "Advanced Thermal Design"
+    ],
+    "availableColors": ["Space Grey", "Lunar Silver"]
+  },
+
+  {
+    "productId": "STREAMLINE-STUDIOBOOK-14",
+    "productName": "StreamLine StudioBook 14 (S3 Pro)",
+    "manufacturer": "StreamLine Computing",
+    "category": "Professional Creative Laptop",
+    "price": 2299.00,
+    "currency": "USD",
+    "thumbnailUrl": "https://ezcart.com/images/streamline-studiobook14-thumb.jpg",
+    "fullImageUrl": "https://ezcart.com/images/streamline-studiobook14-full.jpg",
+    "shortDescription": "Compact creative powerhouse with incredible efficiency and stunning display.",
+    "longDescription": "The 14-inch StreamLine StudioBook with the S3 Pro chip delivers groundbreaking performance for demanding professional workflows. Its Retina XDR display is unparalleled, and the legendary battery life means you can create on the go for extended periods. Perfect for coding, video editing, and music production.",
+    "specifications": {
+      "processor": "StreamLine S3 Pro chip (11-core CPU, 14-core GPU)",
+      "graphicsCard": "Integrated StreamLine S3 Pro 14-core GPU",
+      "ram": "18GB Unified Memory",
+      "storage": "512GB SSD",
+      "display": "14.2-inch Liquid Retina XDR, 3024 x 1964, 1600 nits peak, ProMotion",
+      "batteryLifeHours": 18,
+      "weightKg": 1.62,
+      "ports": ["3x SuperPort 4 (USB-C)", "HDMI", "UHS-II Card slot", "MagLink 3", "Headphone Jack"],
+      "operatingSystem": "ArtisanOS Sonoma",
+      "webcam": "1080p StudioCam HD"
+    },
+    "features": [
+      "Liquid Retina XDR Display",
+      "ProMotion Dynamic Refresh",
+      "Unibody Aluminum Design",
+      "Immersive Spatial Audio",
+      "Ergonomic TouchPad"
+    ],
+    "availableColors": ["Obsidian Black", "Titanium Silver"]
+  },
+
+  {
+    "productId": "FUSION-APEX-16",
+    "productName": "Fusion Dynamics Apex 16 Gaming Laptop",
+    "manufacturer": "Fusion Dynamics",
+    "category": "Gaming Laptop PC",
+    "price": 2499.00,
+    "currency": "USD",
+    "thumbnailUrl": "https://ezcart.com/images/fusionapex16-thumb.jpg",
+    "fullImageUrl": "https://ezcart.com/images/fusionapex16-full.jpg",
+    "shortDescription": "Unleash ultimate gaming power with the Fusion Dynamics Apex 16.",
+    "longDescription": "Experience unparalleled gaming performance with the Fusion Dynamics Apex 16. Equipped with the latest Intel Core i9 processor and a top-tier NVIDIA RTX 4080, this machine is built for competitive gaming and demanding tasks. Its high-refresh-rate QHD display ensures smooth, immersive visuals, while advanced cooling keeps everything running optimally.",
+    "specifications": {
+      "processor": "Intel Core i9-14900HX (24-core)",
+      "graphicsCard": "NVIDIA GeForce RTX 4080 12GB GDDR6",
+      "ram": "64GB DDR5 5600MHz",
+      "storage": "2TB PCIe Gen4 NVMe SSD",
+      "display": "16-inch QHD (2560 x 1600), 240Hz, 500 nits, Fusion-Sync",
+      "batteryLifeHours": 6,
+      "weightKg": 2.6,
+      "ports": ["1x SuperPort 4 (USB-C)", "2x USB 3.2 Gen 2 Type-A", "HDMI 2.1", "RJ45 Ethernet", "Headphone Jack"],
+      "operatingSystem": "QuantumOS 11 Pro",
+      "webcam": "1080p FHD"
+    },
+    "features": [
+      "Vapor Chamber Cooling System",
+      "Customizable RGB mechanical keyboard",
+      "Dynamic Audio Engine",
+      "Reinforced Magnesium-Aluminum Chassis",
+      "Dedicated MUX Switch"
+    ],
+    "availableColors": ["Cosmic Black", "Deep Red"]
+  },
+
+  {
+    "productId": "ZENITH-AURAFLOW-13",
+    "productName": "Zenith AuraFlow 13 Ultrabook",
+    "manufacturer": "Zenith Tech",
+    "category": "Ultrabook",
+    "price": 1299.00,
+    "currency": "USD",
+    "thumbnailUrl": "https://ezcart.com/images/zenith-auraflow13-thumb.jpg",
+    "fullImageUrl": "https://ezcart.com/images/zenith-auraflow13-full.jpg",
+    "shortDescription": "Ultra-portable and elegant for on-the-go productivity.",
+    "longDescription": "The Zenith AuraFlow 13 combines a stunning, vibrant display with an ultra-lightweight design, making it the perfect companion for business professionals and students. Its efficient Intel Core Ultra processor delivers excellent battery life and snappy performance for everyday tasks, web Browse, and document editing.",
+    "specifications": {
+      "processor": "Intel Core Ultra 7 155H (16-core)",
+      "graphicsCard": "Integrated Intel Arc Graphics",
+      "ram": "16GB LPDDR5X 7467MHz",
+      "storage": "512GB PCIe Gen4 NVMe SSD",
+      "display": "13.3-inch QHD+ (2880 x 1800) OLED, Touch, 600 nits, 100% DCI-P3",
+      "batteryLifeHours": 15,
+      "weightKg": 0.98,
+      "ports": ["2x SuperPort 4 (USB-C)", "1x USB 3.2 Gen 1 Type-A", "Headphone Jack"],
+      "operatingSystem": "QuantumOS 11 Home",
+      "webcam": "1080p FHD IR (VisionSense)"
+    },
+    "features": [
+      "Ultra-light Magnesium Alloy Chassis",
+      "ErgoLift Hinge Design",
+      "AI-powered Noise Cancellation",
+      "Hyper-speed Wi-Fi 7",
+      "Integrated Fingerprint Reader"
+    ],
+    "availableColors": ["Luna White", "Midnight Grey"]
+  },
+
+  {
+    "productId": "VIRTUO-PROBOOK-15",
+    "productName": "VirtuoSystems ProBook 15",
+    "manufacturer": "VirtuoSystems",
+    "category": "Business & Everyday Laptop",
+    "price": 799.00,
+    "currency": "USD",
+    "thumbnailUrl": "https://ezcart.com/images/virtuoprobook15-thumb.jpg",
+    "fullImageUrl": "https://ezcart.com/images/virtuoprobook15-full.jpg",
+    "shortDescription": "Reliable and affordable 15-inch laptop for daily productivity and learning.",
+    "longDescription": "The VirtuoSystems ProBook 15 is designed for dependable daily performance, perfect for students, small businesses, and home users. It features a responsive Intel Core i5 processor, ample storage, and a comfortable keyboard, making it ideal for web Browse, office applications, and online learning. Built for durability and value.",
+    "specifications": {
+      "processor": "Intel Core i5-1235U (10-core)",
+      "graphicsCard": "Integrated Intel Iris Xe Graphics",
+      "ram": "8GB DDR4 3200MHz",
+      "storage": "256GB PCIe NVMe SSD",
+      "display": "15.6-inch FHD (1920 x 1080), IPS, 250 nits",
+      "batteryLifeHours": 8,
+      "weightKg": 1.7,
+      "ports": ["1x USB 3.2 Gen 1 Type-C", "2x USB 3.2 Gen 1 Type-A", "HDMI 1.4b", "RJ45 Ethernet", "Headphone Jack"],
+      "operatingSystem": "QuantumOS 11 Home",
+      "webcam": "720p HD"
+    },
+    "features": [
+      "Durable Chassis",
+      "Full-size Numeric Keypad",
+      "Fast SSD Storage",
+      "Stereo Speakers",
+      "Integrated Security Chip"
+    ],
+    "availableColors": ["Graphite Black"]
+  },
+
+  {
+    "productId": "TECHFORGE-CREATORX-17",
+    "productName": "TechForge CreatorX 17 Pro Workstation",
+    "manufacturer": "TechForge Innovations",
+    "category": "Workstation Laptop",
+    "price": 3199.00,
+    "currency": "USD",
+    "thumbnailUrl": "https://ezcart.com/images/techforgecreatorx17-thumb.jpg",
+    "fullImageUrl": "https://ezcart.com/images/techforgecreatorx17-full.jpg",
+    "shortDescription": "Unleash professional creativity with a large, color-accurate display and extreme power.",
+    "longDescription": "The TechForge CreatorX 17 is engineered for ultimate performance in creative and professional applications. Its expansive 17-inch 4K Mini-LED display offers unparalleled color accuracy and brightness, perfect for video editing, 3D rendering, and graphic design. Paired with a desktop-class processor and a high-end professional GPU, this laptop handles the most demanding tasks with ease.",
+    "specifications": {
+      "processor": "Intel Core i9-14900HX (24-core)",
+      "graphicsCard": "NVIDIA GeForce RTX 4090 16GB GDDR6",
+      "ram": "64GB DDR5 5600MHz",
+      "storage": "4TB (2x 2TB) PCIe Gen4 NVMe SSD RAID 0",
+      "display": "17.0-inch 4K (3840 x 2400) Mini-LED, 1000 nits, 100% Adobe RGB, Delta E < 1",
+      "batteryLifeHours": 7,
+      "weightKg": 2.9,
+      "ports": ["2x Thunderbolt 4 (USB-C)", "3x USB 3.2 Gen 2 Type-A", "HDMI 2.1", "Mini DisplayPort 1.4", "SD Express Reader", "RJ45 Ethernet", "Headphone Jack"],
+      "operatingSystem": "QuantumOS 11 Pro",
+      "webcam": "1080p FHD IR"
+    },
+    "features": [
+      "Calibrated Mini-LED Display",
+      "Vapor Chamber Cooling Pro",
+      "Durable Magnesium-Aluminum Chassis",
+      "Large Haptic Trackpad",
+      "Advanced Security Suite"
+    ],
+    "availableColors": ["Creator Black"]
+  }
+]
