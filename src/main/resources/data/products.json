@@ -22,6 +22,70 @@
       "operatingSystem": "QuantumOS 11 Home",
       "webcam": "1080p FHD"
     },
+    "detailedSpecifications": {
+      "processorDetails": {
+        "model": "Intel Core i7-13700H",
+        "cores": "14 (6 Performance-cores, 8 Efficient-cores)",
+        "threads": 20,
+        "baseClock": "2.4 GHz",
+        "maxTurboFrequency": "5.0 GHz",
+        "cache": "24MB Intel Smart Cache"
+      },
+      "graphicsDetails": {
+        "dedicatedGpu": "NVIDIA GeForce RTX 4060",
+        "vram": "8GB GDDR6",
+        "tgp": "Up to 115W (Dynamic Boost)",
+        "integratedGpu": "Intel Iris Xe Graphics"
+      },
+      "memoryDetails": {
+        "type": "DDR5",
+        "speed": "4800MHz",
+        "capacity": "32GB (2x 16GB)",
+        "slots": "2x SODIMM (user upgradable to 64GB)"
+      },
+      "storageDetails": {
+        "type": "PCIe Gen4 NVMe SSD",
+        "capacity": "1TB",
+        "readSpeed": "Up to 7000 MB/s",
+        "writeSpeed": "Up to 5000 MB/s",
+        "slots": "2x M.2 slots"
+      },
+      "displayDetails": {
+        "size": "15.6-inch",
+        "panelType": "OLED",
+        "resolution": "3.5K (3456 x 2160)",
+        "refreshRate": "60Hz",
+        "brightness": "400 nits (typical)",
+        "colorGamut": "100% DCI-P3",
+        "features": ["Touchscreen", "Dolby Vision", "Anti-Reflective Coating", "InfinityEdge"]
+      },
+      "connectivity": {
+        "wifi": "Intel Killer Wi-Fi 6E AX1675 (2x2)",
+        "bluetooth": "Bluetooth 5.2",
+        "usbPorts": ["2x Thunderbolt 4 (USB-C) with Power Delivery & DisplayPort", "1x USB 3.2 Gen 2 Type-C"],
+        "videoOutputs": ["DisplayPort via USB-C"],
+        "cardReader": "SD Card Reader (SD, SDHC, SDXC)",
+        "audioJack": "3.5mm Headphone/Microphone Combo Jack"
+      },
+      "power": {
+        "batteryType": "6-cell Li-Ion",
+        "batteryCapacityWh": 86,
+        "adapterWattage": "130W USB-C Power Adapter",
+        "chargingFeatures": "ExpressCharge"
+      },
+      "physicalAttributes": {
+        "dimensionsMm": {"height": "18.0 mm", "width": "344.72 mm", "depth": "223.75 mm"},
+        "weightKg": 1.92,
+        "chassisMaterial": "CNC machined aluminum with Gorilla Glass 6",
+        "keyboard": "Backlit Chiclet Keyboard with Fingerprint Reader"
+      },
+      "audioVisual": {
+        "speakers": "Quad-speaker design with Waves MaxxAudio Pro",
+        "microphone": "Dual-array microphones",
+        "webcamResolution": "1080p FHD",
+        "webcamFeatures": "IR Camera (Windows Hello Compatible)"
+      }
+    },
     "features": [
       "Edge-to-Edge OLED Display",
       "Precision-milled aluminum chassis",
@@ -54,6 +118,69 @@
       "ports": ["3x SuperPort 4 (USB-C)", "HDMI", "UHS-II Card slot", "MagLink 3", "Headphone Jack"],
       "operatingSystem": "ArtisanOS Sonoma",
       "webcam": "1080p StudioCam HD"
+    },
+    "detailedSpecifications": {
+      "processorDetails": {
+        "model": "StreamLine S3 Pro",
+        "cpuCores": "11 (8 performance, 3 efficiency)",
+        "gpuCores": 14,
+        "neuralEngineCores": 16,
+        "bandwidth": "150GB/s Unified Memory Bandwidth"
+      },
+      "graphicsDetails": {
+        "integratedGpu": "StreamLine S3 Pro 14-core GPU",
+        "features": ["Hardware-accelerated ray tracing", "Mesh shading"]
+      },
+      "memoryDetails": {
+        "type": "Unified Memory",
+        "capacity": "18GB",
+        "upgradeability": "Not user upgradable"
+      },
+      "storageDetails": {
+        "type": "Integrated SSD",
+        "capacity": "512GB",
+        "readSpeed": "Up to 7.4 GB/s",
+        "writeSpeed": "Up to 5.8 GB/s",
+        "configurations": ["Configurable up to 4TB"]
+      },
+      "displayDetails": {
+        "size": "14.2-inch",
+        "panelType": "Liquid Retina XDR",
+        "resolution": "3024 x 1964",
+        "pixelDensity": "254 ppi",
+        "refreshRate": "Up to 120Hz (ProMotion adaptive)",
+        "brightness": "1000 nits sustained (1600 nits peak for HDR)",
+        "contrastRatio": "1,000,000:1",
+        "colorGamut": "P3 wide color",
+        "features": ["True Tone technology"]
+      },
+      "connectivity": {
+        "wifi": "Wi-Fi 6E (802.11ax)",
+        "bluetooth": "Bluetooth 5.3",
+        "usbPorts": ["3x SuperPort 4 (USB-C)"],
+        "videoOutputs": ["HDMI 2.1 (supports external display up to 8K)", "DisplayPort via USB-C"],
+        "cardReader": "SDXC Card slot (UHS-II support)",
+        "chargingPort": "MagLink 3",
+        "audioJack": "3.5mm Headphone Jack (high-impedance headphone support)"
+      },
+      "power": {
+        "batteryType": "Lithium-polymer",
+        "batteryCapacityWh": 70,
+        "adapterWattage": "70W USB-C Power Adapter",
+        "chargingFeatures": "Fast-charge capable"
+      },
+      "physicalAttributes": {
+        "dimensionsMm": {"height": "15.5 mm", "width": "312.6 mm", "depth": "221.2 mm"},
+        "weightKg": 1.62,
+        "chassisMaterial": "Aluminum Unibody",
+        "keyboard": "Magic Keyboard with Force Touch Trackpad and Touch ID"
+      },
+      "audioVisual": {
+        "speakers": "Six-speaker sound system with force-cancelling woofers",
+        "microphone": "Studio-quality three-mic array with high signal-to-noise ratio",
+        "webcamResolution": "1080p StudioCam HD",
+        "webcamFeatures": ["Advanced image signal processor"]
+      }
     },
     "features": [
       "Liquid Retina XDR Display",
@@ -88,6 +215,68 @@
       "operatingSystem": "QuantumOS 11 Pro",
       "webcam": "1080p FHD"
     },
+    "detailedSpecifications": {
+      "processorDetails": {
+        "model": "Intel Core i9-14900HX",
+        "cores": "24 (8 Performance-cores, 16 Efficient-cores)",
+        "threads": 32,
+        "maxTurboFrequency": "5.8 GHz",
+        "cache": "36MB Intel Smart Cache"
+      },
+      "graphicsDetails": {
+        "dedicatedGpu": "NVIDIA GeForce RTX 4080",
+        "vram": "12GB GDDR6",
+        "tgp": "Up to 175W (with Dynamic Boost)",
+        "features": ["DLSS 3", "Ray Tracing Cores", "MUX Switch"]
+      },
+      "memoryDetails": {
+        "type": "DDR5",
+        "speed": "5600MHz",
+        "capacity": "64GB (2x 32GB)",
+        "slots": "2x SODIMM (upgradable to 96GB)"
+      },
+      "storageDetails": {
+        "type": "PCIe Gen4 NVMe SSD",
+        "capacity": "2TB (1x 2TB)",
+        "readSpeed": "Up to 7000 MB/s",
+        "writeSpeed": "Up to 6000 MB/s",
+        "slots": "2x M.2 slots (supports RAID 0/1)"
+      },
+      "displayDetails": {
+        "size": "16-inch",
+        "panelType": "IPS-level",
+        "resolution": "QHD (2560 x 1600)",
+        "refreshRate": "240Hz",
+        "responseTime": "3ms",
+        "brightness": "500 nits",
+        "colorGamut": "100% DCI-P3",
+        "features": ["Fusion-Sync (Adaptive Sync)", "Anti-glare"]
+      },
+      "connectivity": {
+        "wifi": "Killer Wi-Fi 6E AX1690i (2x2)",
+        "bluetooth": "Bluetooth 5.3",
+        "usbPorts": ["1x SuperPort 4 (USB-C) with DisplayPort", "2x USB 3.2 Gen 2 Type-A"],
+        "videoOutputs": ["HDMI 2.1 (supports 8K@60Hz/4K@120Hz)"],
+        "ethernet": "RJ45 (2.5Gbe)",
+        "audioJack": "3.5mm Headphone/Microphone Combo Jack"
+      },
+      "power": {
+        "batteryType": "4-cell Li-Polymer",
+        "batteryCapacityWh": 90,
+        "adapterWattage": "330W AC Adapter"
+      },
+      "physicalAttributes": {
+        "dimensionsMm": {"height": "23.9 mm", "width": "357.7 mm", "depth": "272.1 mm"},
+        "weightKg": 2.6,
+        "chassisMaterial": "Aluminum lid and palm rest, ABS bottom",
+        "keyboard": "Per-key RGB mechanical keyboard"
+      },
+      "audioVisual": {
+        "speakers": "2x 2W Speakers with Dynamic Audio Engine",
+        "microphone": "Dual-array microphones",
+        "webcamResolution": "1080p FHD"
+      }
+    },
     "features": [
       "Vapor Chamber Cooling System",
       "Customizable RGB mechanical keyboard",
@@ -108,7 +297,7 @@
     "thumbnailUrl": "https://ezcart.com/images/zenith-auraflow13-thumb.jpg",
     "fullImageUrl": "https://ezcart.com/images/zenith-auraflow13-full.jpg",
     "shortDescription": "Ultra-portable and elegant for on-the-go productivity.",
-    "longDescription": "The Zenith AuraFlow 13 combines a stunning, vibrant display with an ultra-lightweight design, making it the perfect companion for business professionals and students. Its efficient Intel Core Ultra processor delivers excellent battery life and snappy performance for everyday tasks, web Browse, and document editing.",
+    "longDescription": "The Zenith AuraFlow 13 combines a stunning, vibrant display with an ultra-lightweight design, making it the perfect companion for business professionals and students. Its efficient Intel Core Ultra processor delivers excellent battery life and snappy performance for everyday tasks, web browsing, and document editing.",
     "specifications": {
       "processor": "Intel Core Ultra 7 155H (16-core)",
       "graphicsCard": "Integrated Intel Arc Graphics",
@@ -120,6 +309,68 @@
       "ports": ["2x SuperPort 4 (USB-C)", "1x USB 3.2 Gen 1 Type-A", "Headphone Jack"],
       "operatingSystem": "QuantumOS 11 Home",
       "webcam": "1080p FHD IR (VisionSense)"
+    },
+    "detailedSpecifications": {
+      "processorDetails": {
+        "model": "Intel Core Ultra 7 155H",
+        "cores": "16 (6 Performance-cores, 8 Efficient-cores, 2 Low-Power E-cores)",
+        "threads": 22,
+        "maxTurboFrequency": "4.8 GHz",
+        "cache": "24MB Intel Smart Cache",
+        "npu": "Intel AI Boost NPU"
+      },
+      "graphicsDetails": {
+        "integratedGpu": "Integrated Intel Arc Graphics (8 Xe Cores)",
+        "features": ["XeSS", "Ray Tracing"]
+      },
+      "memoryDetails": {
+        "type": "LPDDR5X",
+        "speed": "7467MHz",
+        "capacity": "16GB (soldered)",
+        "upgradeability": "Not user upgradable"
+      },
+      "storageDetails": {
+        "type": "PCIe Gen4 NVMe SSD",
+        "capacity": "512GB",
+        "readSpeed": "Up to 6500 MB/s",
+        "writeSpeed": "Up to 4500 MB/s",
+        "slots": "1x M.2 slot"
+      },
+      "displayDetails": {
+        "size": "13.3-inch",
+        "panelType": "OLED",
+        "resolution": "QHD+ (2880 x 1800)",
+        "refreshRate": "60Hz",
+        "brightness": "600 nits (HDR peak)",
+        "colorGamut": "100% DCI-P3",
+        "features": ["Touchscreen", "Vivid Color Engine", "Anti-Glare Finish"]
+      },
+      "connectivity": {
+        "wifi": "Hyper-speed Wi-Fi 7 (802.11be) 2x2",
+        "bluetooth": "Bluetooth 5.3",
+        "usbPorts": ["2x SuperPort 4 (USB-C) with Power Delivery & DisplayPort", "1x USB 3.2 Gen 1 Type-A"],
+        "videoOutputs": ["DisplayPort via USB-C"],
+        "audioJack": "3.5mm Headphone/Microphone Combo Jack"
+      },
+      "power": {
+        "batteryType": "3-cell Li-Polymer",
+        "batteryCapacityWh": 63,
+        "adapterWattage": "65W USB-C Power Adapter",
+        "chargingFeatures": "Fast Charge (50% in 30 minutes)"
+      },
+      "physicalAttributes": {
+        "dimensionsMm": {"height": "11.2 mm", "width": "298.1 mm", "depth": "209.1 mm"},
+        "weightKg": 0.98,
+        "chassisMaterial": "Magnesium Alloy",
+        "keyboard": "Backlit Chiclet Keyboard",
+        "security": "Integrated Fingerprint Reader (Windows Hello)"
+      },
+      "audioVisual": {
+        "speakers": "Dual front-firing speakers with AI-powered Noise Cancellation",
+        "microphone": "Quad-array microphones",
+        "webcamResolution": "1080p FHD IR",
+        "webcamFeatures": "VisionSense Facial Recognition"
+      }
     },
     "features": [
       "Ultra-light Magnesium Alloy Chassis",
@@ -141,7 +392,7 @@
     "thumbnailUrl": "https://ezcart.com/images/virtuoprobook15-thumb.jpg",
     "fullImageUrl": "https://ezcart.com/images/virtuoprobook15-full.jpg",
     "shortDescription": "Reliable and affordable 15-inch laptop for daily productivity and learning.",
-    "longDescription": "The VirtuoSystems ProBook 15 is designed for dependable daily performance, perfect for students, small businesses, and home users. It features a responsive Intel Core i5 processor, ample storage, and a comfortable keyboard, making it ideal for web Browse, office applications, and online learning. Built for durability and value.",
+    "longDescription": "The VirtuoSystems ProBook 15 is designed for dependable daily performance, perfect for students, small businesses, and home users. It features a responsive Intel Core i5 processor, ample storage, and a comfortable keyboard, making it ideal for web browsing, office applications, and online learning. Built for durability and value.",
     "specifications": {
       "processor": "Intel Core i5-1235U (10-core)",
       "graphicsCard": "Integrated Intel Iris Xe Graphics",
@@ -153,6 +404,65 @@
       "ports": ["1x USB 3.2 Gen 1 Type-C", "2x USB 3.2 Gen 1 Type-A", "HDMI 1.4b", "RJ45 Ethernet", "Headphone Jack"],
       "operatingSystem": "QuantumOS 11 Home",
       "webcam": "720p HD"
+    },
+    "detailedSpecifications": {
+      "processorDetails": {
+        "model": "Intel Core i5-1235U",
+        "cores": "10 (2 Performance-cores, 8 Efficient-cores)",
+        "threads": 12,
+        "maxTurboFrequency": "4.4 GHz",
+        "cache": "12MB Intel Smart Cache"
+      },
+      "graphicsDetails": {
+        "integratedGpu": "Integrated Intel Iris Xe Graphics (80 EUs)",
+        "features": []
+      },
+      "memoryDetails": {
+        "type": "DDR4",
+        "speed": "3200MHz",
+        "capacity": "8GB (1x 8GB)",
+        "slots": "2x SODIMM (upgradable to 32GB)"
+      },
+      "storageDetails": {
+        "type": "PCIe NVMe SSD",
+        "capacity": "256GB",
+        "readSpeed": "Up to 3500 MB/s",
+        "writeSpeed": "Up to 2500 MB/s",
+        "slots": "1x M.2 slot"
+      },
+      "displayDetails": {
+        "size": "15.6-inch",
+        "panelType": "IPS",
+        "resolution": "FHD (1920 x 1080)",
+        "refreshRate": "60Hz",
+        "brightness": "250 nits",
+        "colorGamut": "45% NTSC",
+        "features": ["Anti-Glare"]
+      },
+      "connectivity": {
+        "wifi": "Wi-Fi 5 (802.11ac) 1x1",
+        "bluetooth": "Bluetooth 5.0",
+        "usbPorts": ["1x USB 3.2 Gen 1 Type-C (Data Transfer Only)", "2x USB 3.2 Gen 1 Type-A"],
+        "videoOutputs": ["HDMI 1.4b"],
+        "ethernet": "RJ45 Gigabit Ethernet",
+        "audioJack": "3.5mm Headphone/Microphone Combo Jack"
+      },
+      "power": {
+        "batteryType": "3-cell Li-Ion",
+        "batteryCapacityWh": 45,
+        "adapterWattage": "65W AC Adapter"
+      },
+      "physicalAttributes": {
+        "dimensionsMm": {"height": "19.9 mm", "width": "359.2 mm", "depth": "235.8 mm"},
+        "weightKg": 1.7,
+        "chassisMaterial": "Plastic",
+        "keyboard": "Full-size Numeric Keypad, non-backlit"
+      },
+      "audioVisual": {
+        "speakers": "2x 1.5W Stereo Speakers",
+        "microphone": "Integrated digital microphone",
+        "webcamResolution": "720p HD"
+      }
     },
     "features": [
       "Durable Chassis",
@@ -186,6 +496,72 @@
       "ports": ["2x Thunderbolt 4 (USB-C)", "3x USB 3.2 Gen 2 Type-A", "HDMI 2.1", "Mini DisplayPort 1.4", "SD Express Reader", "RJ45 Ethernet", "Headphone Jack"],
       "operatingSystem": "QuantumOS 11 Pro",
       "webcam": "1080p FHD IR"
+    },
+    "detailedSpecifications": {
+      "processorDetails": {
+        "model": "Intel Core i9-14900HX",
+        "cores": "24 (8 Performance-cores, 16 Efficient-cores)",
+        "threads": 32,
+        "maxTurboFrequency": "5.8 GHz",
+        "cache": "36MB Intel Smart Cache"
+      },
+      "graphicsDetails": {
+        "dedicatedGpu": "NVIDIA GeForce RTX 4090",
+        "vram": "16GB GDDR6",
+        "tgp": "Up to 175W+ (Dynamic Boost)",
+        "features": ["Studio Drivers", "Tensor Cores", "RT Cores", "DLSS 3.5"]
+      },
+      "memoryDetails": {
+        "type": "DDR5",
+        "speed": "5600MHz",
+        "capacity": "64GB (2x 32GB)",
+        "slots": "2x SODIMM (upgradable to 128GB)"
+      },
+      "storageDetails": {
+        "type": "PCIe Gen4 NVMe SSD",
+        "capacity": "4TB (Configured as 2x 2TB)",
+        "raidConfiguration": "RAID 0 (for maximum speed)",
+        "readSpeed": "Up to 14000 MB/s (RAID 0)",
+        "writeSpeed": "Up to 12000 MB/s (RAID 0)",
+        "slots": "2x M.2 slots"
+      },
+      "displayDetails": {
+        "size": "17.0-inch",
+        "panelType": "Mini-LED IPS",
+        "resolution": "4K (3840 x 2400)",
+        "aspectRatio": "16:10",
+        "refreshRate": "120Hz",
+        "brightness": "1000 nits (peak HDR)",
+        "colorGamut": "100% Adobe RGB, 100% DCI-P3, 100% sRGB",
+        "colorAccuracy": "Delta E < 1 (factory calibrated)",
+        "features": ["VESA DisplayHDR 1000", "Anti-glare"]
+      },
+      "connectivity": {
+        "wifi": "Wi-Fi 6E (802.11ax) 2x2",
+        "bluetooth": "Bluetooth 5.3",
+        "usbPorts": ["2x Thunderbolt 4 (USB-C) with Power Delivery & DisplayPort", "3x USB 3.2 Gen 2 Type-A"],
+        "videoOutputs": ["HDMI 2.1", "Mini DisplayPort 1.4"],
+        "cardReader": "SD Express Card Reader",
+        "ethernet": "RJ45 (2.5Gbe) Ethernet",
+        "audioJack": "3.5mm Headphone/Microphone Combo Jack"
+      },
+      "power": {
+        "batteryType": "4-cell Li-Polymer",
+        "batteryCapacityWh": 99.9,
+        "adapterWattage": "330W AC Adapter"
+      },
+      "physicalAttributes": {
+        "dimensionsMm": {"height": "25.9 mm", "width": "399.0 mm", "depth": "288.0 mm"},
+        "weightKg": 2.9,
+        "chassisMaterial": "Magnesium-Aluminum Alloy",
+        "keyboard": "Backlit Chiclet Keyboard with Numeric Keypad"
+      },
+      "audioVisual": {
+        "speakers": "Stereo speakers with Smart Amp Technology",
+        "microphone": "AI Noise-Cancelling Microphone",
+        "webcamResolution": "1080p FHD IR",
+        "webcamFeatures": ["Windows Hello Compatible", "Temporal Noise Reduction"]
+      }
     },
     "features": [
       "Calibrated Mini-LED Display",
