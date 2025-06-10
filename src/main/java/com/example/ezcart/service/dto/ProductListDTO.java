@@ -14,6 +14,8 @@ public record ProductListDTO(
     String thumbnailUrl,
     String fullImageUrl,
     String shortDescription,
+    Object specifications,
+    String[] features,
     String[] availableColors
 ) {
     public static ProductListDTO fromProduct(Product product) {
@@ -27,6 +29,8 @@ public record ProductListDTO(
             product.thumbnailUrl(),
             product.fullImageUrl(),
             product.shortDescription(),
+            product.specifications(),
+            product.features(),
             product.availableColors()
         );
     }
