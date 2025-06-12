@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview"
   },
+  "proxy": "http://localhost:7070",
   "dependencies": {
     "react": "^19.1.0",
     "react-dom": "^19.1.0"

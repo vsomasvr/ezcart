@@ -12,6 +12,28 @@ export default defineConfig(({ mode }) => {
         alias: {
           '@': path.resolve(__dirname, '.'),
         }
+      },
+      server: {
+        proxy: {
+          '^/api': {
+            target: 'http://localhost:7070',
+            changeOrigin: true,
+            secure: false,
+            rewrite: (path) => path,
+            configure: (proxy, _options) => {
+              proxy.on('error', (err, _req, _res) => {
+                console.log('Proxy error:', err);
+              });
+              proxy.on('proxyReq', (proxyReq, req, _res) => {
+                console.log('Proxying request:', {
+                  originalUrl: req.originalUrl,
+                  target: proxyReq.path,
+                  method: req.method
+                });
+              });
+            }
+          }
+        }
       }
     };
 });

@@ -10,7 +10,7 @@ import SignInView from './src/components/SignInView';
 import ChatToggleButton from './src/components/ChatToggleButton'; // New Import
 import ChatPanel from './src/components/ChatPanel'; // New Import
 import { Product, CartItem, DetailedCartItem, ChatMessage, View } from './src/types'; // Added ChatMessage, View
-import { getProducts } from './src/mockApiService';
+import { getProducts } from './src/apiService';
 import * as cartService from './src/cartService';
 import { parseRamToGB, parseStorageToGB } from './src/utils';
 

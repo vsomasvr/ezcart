@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Product, Review, Specifications, CartItem } from '../types'; // Added CartItem
-import { getProductById, getReviewsByProductId } from '../mockApiService';
+import { getProductById, getReviewsByProductId } from '../apiService';
 import ReviewList from './ReviewList';
 import LoadingSpinner from './LoadingSpinner';
 
