@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,6 +53,73 @@ public class ProductService {
     public List<ProductListDTO> getProductsByCategory(String category) {
         return products.stream()
                 .filter(p -> p.category().equalsIgnoreCase(category))
+                .map(ProductListDTO::fromProduct)
+                .toList();
+    }
+
+    private boolean matchesQuery(String query, String text) {
+        if (!StringUtils.hasLength(text)) return false;
+        
+        // Split query into words and convert to lowercase for case-insensitive matching
+        String[] queryWords = query.toLowerCase().split("\\s+");
+        String lowerText = text.toLowerCase();
+        
+        // Limit the number of query words to prevent performance issues
+        int maxWordsToCheck = Math.min(10, queryWords.length);
+        int wordsToCheck = Math.min(queryWords.length, maxWordsToCheck);
+        
+        // All query words must be found in the text
+        for (int i = 0; i < wordsToCheck; i++) {
+            String word = queryWords[i].trim();
+            if (!word.isEmpty() && !lowerText.matches(".*" + java.util.regex.Pattern.quote(word) + ".*")) {
+                return false;
+            }
+        }
+        return wordsToCheck > 0; // Only return true if there were actual words to check
+    }
+    
+    private String getSearchableText(Product product) {
+        // Convert specifications to string if they exist
+        String specsText = "";
+        if (product.specifications() != null) {
+            if (product.specifications() instanceof String) {
+                specsText = (String) product.specifications();
+            } else {
+                // Convert the specifications object to a string representation
+                specsText = product.specifications().toString();
+            }
+        }
+        
+        return String.join(" ",
+            product.productName() != null ? product.productName() : "",
+            product.shortDescription() != null ? product.shortDescription() : "",
+            product.longDescription() != null ? product.longDescription() : "",
+            product.features() != null ? String.join(" ", product.features()) : "",
+            specsText
+        ).toLowerCase();
+    }
+    
+    private boolean matchesCategory(Product product, String category) {
+        return product.category() != null && product.category().equalsIgnoreCase(category);
+    }
+    
+    private boolean matchesManufacturer(Product product, String manufacturer) {
+        return product.manufacturer() != null && product.manufacturer().equalsIgnoreCase(manufacturer);
+    }
+    
+    private boolean matchesPrice(Product product, Double minPrice, Double maxPrice) {
+        return (minPrice == null || product.price() >= minPrice) && 
+               (maxPrice == null || product.price() <= maxPrice);
+    }
+    
+    public List<ProductListDTO> searchProducts(String query, String category, Double minPrice, Double maxPrice, String manufacturer) {
+        return products.stream()
+                .filter(product -> 
+                    (!StringUtils.hasLength(category) || matchesCategory(product, category)) &&
+                    matchesPrice(product, minPrice, maxPrice) &&
+                    (!StringUtils.hasLength(manufacturer) || matchesManufacturer(product, manufacturer)) &&
+                    (!StringUtils.hasLength(query) || matchesQuery(query, getSearchableText(product)))
+                )
                 .map(ProductListDTO::fromProduct)
                 .toList();
     }

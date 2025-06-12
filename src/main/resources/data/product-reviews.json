@@ -26,7 +26,6 @@
     "comment": "As a student, it was a big investment, but the performance and screen quality make it worth it for my CAD projects. It's solid, but a bit heavy to carry around campus all day.",
     "date": "2024-05-20"
   },
-
   {
     "reviewId": "REV-004",
     "productId": "STREAMLINE-STUDIOBOOK-14",
@@ -54,7 +53,6 @@
     "comment": "I use this for music production on the go. The M3 Pro chip handles all my VSTs and audio tracks without a hitch. The compact size and long battery are perfect for flights.",
     "date": "2024-06-10"
   },
-
   {
     "reviewId": "REV-007",
     "productId": "FUSION-APEX-16",
@@ -82,7 +80,6 @@
     "comment": "When playing demanding games for a long time, I notice some throttling and it gets extremely hot around the keyboard. The fans are also excessively loud, even in a quiet room. Not for everyone.",
     "date": "2024-06-08"
   },
-
   {
     "reviewId": "REV-010",
     "productId": "ZENITH-AURAFLOW-13",
@@ -110,7 +107,6 @@
     "comment": "I was skeptical about performance in such a thin laptop, but the Core Ultra chip handles all my office apps and multitasking smoothly. The battery really lasts, and the build feels solid.",
     "date": "2024-06-02"
   },
-
   {
     "reviewId": "REV-013",
     "productId": "VIRTUO-PROBOOK-15",
@@ -138,7 +134,6 @@
     "comment": "Bought a few of these for my small office. They boot fast and handle all our office suite needs without issues. Good value for money, dependable machines.",
     "date": "2024-06-09"
   },
-
   {
     "reviewId": "REV-016",
     "productId": "TECHFORGE-CREATORX-17",
@@ -165,5 +160,167 @@
     "title": "Too bulky for frequent travel",
     "comment": "Performance is amazing for development, but at almost 3kg, it's just too cumbersome to carry around daily. Battery life is also just okay for such a powerful machine. More of a portable desktop than a laptop.",
     "date": "2024-06-07"
+  },
+  {
+    "reviewId": "REV-019",
+    "productId": "CHRONOS-GAMING-15",
+    "userId": "gamer_dude",
+    "rating": 4,
+    "title": "Solid gaming performance for the price!",
+    "comment": "Plays most of my games smoothly. Great for casual gaming sessions. Fans can get a bit loud during intense gameplay.",
+    "date": "2024-05-22"
+  },
+  {
+    "reviewId": "REV-020",
+    "productId": "CHRONOS-GAMING-15",
+    "userId": "budgetGamer",
+    "rating": 5,
+    "title": "Fantastic value for an entry-level gaming laptop.",
+    "comment": "Couldn't be happier with this purchase. It runs Valorant and Fortnite beautifully. The 144Hz screen makes a difference.",
+    "date": "2024-05-27"
+  },
+  {
+    "reviewId": "REV-021",
+    "productId": "CHRONOS-GAMING-15",
+    "userId": "streamer_wannabe",
+    "rating": 3,
+    "title": "Good for gaming, not ideal for streaming and gaming simultaneously.",
+    "comment": "It handles games well, but when I try to stream at the same time, it struggles a bit. Probably need more RAM or a stronger processor for that.",
+    "date": "2024-06-01"
+  },
+  {
+    "reviewId": "REV-022",
+    "productId": "COSMOS-ULTRA-13",
+    "userId": "corporateExec",
+    "rating": 5,
+    "title": "Excellent for business travel and presentations.",
+    "comment": "Lightweight, long battery life, and the 2-in-1 feature is very handy for client presentations. Security features are a big plus.",
+    "date": "2024-05-18"
+  },
+  {
+    "reviewId": "REV-023",
+    "productId": "COSMOS-ULTRA-13",
+    "userId": "IT_pro",
+    "rating": 5,
+    "title": "Robust security and great performance for demanding business applications.",
+    "comment": "Our IT department approved this. The TPM chip and other security measures are great. Performance is snappy for all our enterprise software.",
+    "date": "2024-05-25"
+  },
+  {
+    "reviewId": "REV-024",
+    "productId": "COSMOS-ULTRA-13",
+    "userId": "remoteWorker",
+    "rating": 4,
+    "title": "Great machine, but sometimes wish for more ports.",
+    "comment": "Perfect for remote work, video calls are crisp. The battery is amazing. Only minor drawback is the limited number of ports, I need a dongle for my external monitor and mouse.",
+    "date": "2024-06-03"
+  },
+  {
+    "reviewId": "REV-025",
+    "productId": "ESSENTIAL-NOTEBOOK-15",
+    "userId": "grandma_sues",
+    "rating": 4,
+    "title": "Simple and easy to use for web Browse and emails.",
+    "comment": "My grandson set this up for me. I can easily check my emails and browse the internet. It's not too complicated.",
+    "date": "2024-06-01"
+  },
+  {
+    "reviewId": "REV-026",
+    "productId": "ESSENTIAL-NOTEBOOK-15",
+    "userId": "student_basic",
+    "rating": 3,
+    "title": "Does the job for school work, a bit slow sometimes.",
+    "comment": "It's fine for typing essays and doing online research. Sometimes it feels a bit slow when I have many tabs open, but for the price, it's okay.",
+    "date": "2024-06-06"
+  },
+  {
+    "reviewId": "REV-027",
+    "productId": "ESSENTIAL-NOTEBOOK-15",
+    "userId": "home_budget",
+    "rating": 4,
+    "title": "Good for personal use and light tasks.",
+    "comment": "Bought this for the family for general use. It's good for watching videos and basic office tasks. Can't complain for the price.",
+    "date": "2024-06-10"
+  },
+  {
+    "reviewId": "REV-028",
+    "productId": "STUDENT-PRO-14",
+    "userId": "college_kid",
+    "rating": 5,
+    "title": "Perfect for university life!",
+    "comment": "This laptop is awesome for notes, research, and even some light gaming. The touchscreen is a nice bonus. Battery lasts all day on campus.",
+    "date": "2024-05-29"
+  },
+  {
+    "reviewId": "REV-029",
+    "productId": "STUDENT-PRO-14",
+    "userId": "programming_noob",
+    "rating": 4,
+    "title": "Great for coding and daily tasks, very portable.",
+    "comment": "I'm learning to code and this machine handles VS Code and compilers without issues. It's super light, so carrying it to lectures is easy.",
+    "date": "2024-06-03"
+  },
+  {
+    "reviewId": "REV-030",
+    "productId": "STUDENT-PRO-14",
+    "userId": "multimedia_student",
+    "rating": 4,
+    "title": "Solid performance for multimedia editing, good screen.",
+    "comment": "It's not a powerhouse, but it handles my video editing assignments pretty well for a student laptop. The IPS screen is decent for color accuracy.",
+    "date": "2024-06-08"
+  },
+  {
+    "reviewId": "REV-031",
+    "productId": "BIZPRO-ELITE-14",
+    "userId": "sales_rep_max",
+    "rating": 5,
+    "title": "Ideal business companion - reliable and secure.",
+    "comment": "This laptop is perfect for my sales calls and presentations. The security features give me peace of mind, and it's fast for all my CRM software.",
+    "date": "2024-05-26"
+  },
+  {
+    "reviewId": "REV-032",
+    "productId": "BIZPRO-ELITE-14",
+    "userId": "CEO_traveler",
+    "rating": 5,
+    "title": "Exceptional build quality and performance for executives.",
+    "comment": "I travel constantly and this laptop holds up incredibly well. It's sleek, powerful, and the battery lasts through my longest flights.",
+    "date": "2024-06-02"
+  },
+  {
+    "reviewId": "REV-033",
+    "productId": "BIZPRO-ELITE-14",
+    "userId": "corporate_dev",
+    "rating": 4,
+    "title": "Good for professional development, but could use more RAM options.",
+    "comment": "Handles my development environment well, especially with the Thunderbolt ports. For very large projects, 32GB RAM would be a nice option, but 16GB is usually enough.",
+    "date": "2024-06-07"
+  },
+  {
+    "reviewId": "REV-034",
+    "productId": "MEDIA-MASTER-17",
+    "userId": "pro_video_editor",
+    "rating": 5,
+    "title": "Unmatched performance for 4K video editing on the go!",
+    "comment": "This is a true portable workstation. The 4K screen is stunningly accurate, and the RTX 4070 makes short work of even complex timelines. A game-changer for my professional work.",
+    "date": "2024-05-30"
+  },
+  {
+    "reviewId": "REV-035",
+    "productId": "MEDIA-MASTER-17",
+    "userId": "graphic_designer_pro",
+    "rating": 5,
+    "title": "Incredible display and power for graphic design.",
+    "comment": "The DCI-P3 coverage and Delta E < 1 are critical for my graphic design work, and this laptop delivers. It handles huge Photoshop and Illustrator files with ease.",
+    "date": "2024-06-05"
+  },
+  {
+    "reviewId": "REV-036",
+    "productId": "MEDIA-MASTER-17",
+    "userId": "musician_producer",
+    "rating": 4,
+    "title": "Powerful for music production, but a bit heavy.",
+    "comment": "Runs all my DAWs and VSTs flawlessly. The sound quality is excellent. It's definitely a desktop replacement, so don't expect ultrabook portability.",
+    "date": "2024-06-09"
   }
 ]

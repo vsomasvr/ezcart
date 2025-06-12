@@ -6,11 +6,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 
 public record Review(
-    @JsonProperty("reviewId") String reviewId,
-    @JsonProperty("productId") String productId,
-    @JsonProperty("userId") String userId,
-    @JsonProperty("rating") int rating,
-    @JsonProperty("title") String title,
-    @JsonProperty("comment") String comment,
-    @JsonProperty("date") @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date
+    String reviewId,
+    String productId,
+    String userId,
+    int rating,
+    String title,
+    String comment,
+    @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date
 ) {}

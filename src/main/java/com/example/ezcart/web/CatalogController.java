@@ -36,6 +36,16 @@ public class CatalogController {
         return productService.getProductsByCategory(category);
     }
 
+    @GetMapping(value = "/search")
+    public List<ProductListDTO> searchProducts(
+            @RequestParam(name = "query", required = false) String query,
+            @RequestParam(name = "category", required = false) String category,
+            @RequestParam(name = "minPrice", required = false) Double minPrice,
+            @RequestParam(name = "maxPrice", required = false) Double maxPrice,
+            @RequestParam(name = "manufacturer", required = false) String manufacturer) {
+        return productService.searchProducts(query, category, minPrice, maxPrice, manufacturer);
+    }
+
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<String> handleNoSuchElementException(NoSuchElementException ex) {
         return ResponseEntity.notFound().build();
