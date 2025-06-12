@@ -1,0 +1,6 @@
+
+{
+  "name": "EZCart Product Catalog",
+  "description": "A React application to browse a catalog of products and view their details and reviews. Uses mock data services and Tailwind CSS.",
+  "requestFramePermissions": []
+}
