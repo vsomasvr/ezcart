@@ -42,8 +42,20 @@ public class CatalogController {
             @RequestParam(name = "category", required = false) String category,
             @RequestParam(name = "minPrice", required = false) Double minPrice,
             @RequestParam(name = "maxPrice", required = false) Double maxPrice,
-            @RequestParam(name = "manufacturer", required = false) String manufacturer) {
-        return productService.searchProducts(query, category, minPrice, maxPrice, manufacturer);
+            @RequestParam(name = "manufacturer", required = false) String manufacturer,
+            @RequestParam(name = "spec.ram", required = false) List<String> ramFilters,
+            @RequestParam(name = "spec.processor", required = false) List<String> processorFilters,
+            @RequestParam(name = "spec.storage", required = false) List<String> storageFilters) {
+        return productService.searchProducts(
+                query,
+                category,
+                minPrice,
+                maxPrice,
+                manufacturer,
+                ramFilters,
+                processorFilters,
+                storageFilters
+        );
     }
 
     @ExceptionHandler(NoSuchElementException.class)

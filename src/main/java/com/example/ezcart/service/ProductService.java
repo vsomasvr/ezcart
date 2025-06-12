@@ -112,12 +112,67 @@ public class ProductService {
                (maxPrice == null || product.price() <= maxPrice);
     }
     
-    public List<ProductListDTO> searchProducts(String query, String category, Double minPrice, Double maxPrice, String manufacturer) {
+    private String getSpecificationValue(Product product, String key) {
+        if (product.specifications() == null) {
+            return "";
+        }
+        try {
+            // Use reflection to safely access the specification value
+            java.lang.reflect.Method getter = product.specifications().getClass().getMethod("get", Object.class);
+            Object value = getter.invoke(product.specifications(), key);
+            return value != null ? value.toString() : "";
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private boolean matchesRam(Product product, List<String> ramFilters) {
+        if (ramFilters == null || ramFilters.isEmpty()) {
+            return true;
+        }
+        String ram = getSpecificationValue(product, "ram");
+        return ramFilters.stream()
+            .anyMatch(filter -> StringUtils.hasLength(ram) && 
+                ram.toLowerCase().contains(filter.toLowerCase()));
+    }
+
+    private boolean matchesProcessor(Product product, List<String> processorFilters) {
+        if (processorFilters == null || processorFilters.isEmpty()) {
+            return true;
+        }
+        String processor = getSpecificationValue(product, "processor");
+        return processorFilters.stream()
+            .anyMatch(filter -> StringUtils.hasLength(processor) && 
+                processor.toLowerCase().contains(filter.toLowerCase()));
+    }
+
+    private boolean matchesStorage(Product product, List<String> storageFilters) {
+        if (storageFilters == null || storageFilters.isEmpty()) {
+            return true;
+        }
+        String storage = getSpecificationValue(product, "storage");
+        return storageFilters.stream()
+            .anyMatch(filter -> StringUtils.hasLength(storage) && 
+                storage.toLowerCase().contains(filter.toLowerCase()));
+    }
+
+    public List<ProductListDTO> searchProducts(
+            String query, 
+            String category, 
+            Double minPrice, 
+            Double maxPrice, 
+            String manufacturer,
+            List<String> ramFilters,
+            List<String> processorFilters,
+            List<String> storageFilters) {
         return products.stream()
                 .filter(product -> 
                     (!StringUtils.hasLength(category) || matchesCategory(product, category)) &&
                     matchesPrice(product, minPrice, maxPrice) &&
                     (!StringUtils.hasLength(manufacturer) || matchesManufacturer(product, manufacturer)) &&
+                    matchesRam(product, ramFilters) &&
+                    matchesProcessor(product, processorFilters) &&
+                    matchesStorage(product, storageFilters) &&
                     (!StringUtils.hasLength(query) || matchesQuery(query, getSearchableText(product)))
                 )
                 .map(ProductListDTO::fromProduct)
