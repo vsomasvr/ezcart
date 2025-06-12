@@ -52,7 +52,8 @@ public class ProductService {
 
     public List<ProductListDTO> getProductsByCategory(String category) {
         return products.stream()
-                .filter(p -> p.category().equalsIgnoreCase(category))
+                .filter(p -> p.category().equalsIgnoreCase(category)
+                        || p.subCategory().toLowerCase().contains(category == null ? "" : category.toLowerCase()))
                 .map(ProductListDTO::fromProduct)
                 .toList();
     }

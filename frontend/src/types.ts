@@ -18,6 +18,7 @@ export interface Product {
   productName: string;
   manufacturer: string;
   category: string;
+  subCategory: string;
   price: number;
   currency: string;
   thumbnailUrl: string;

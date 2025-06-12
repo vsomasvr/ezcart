@@ -10,6 +10,7 @@ public record Product(
     String productName,
     String manufacturer,
     String category,
+    String subCategory,
     double price,
     String currency,
     String thumbnailUrl,
