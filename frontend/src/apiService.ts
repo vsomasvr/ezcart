@@ -67,3 +67,45 @@ export async function getReviewsByProductId(productId: string): Promise<Review[]
   }
 }
 
+export interface SearchParams {
+  query?: string;
+  category?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  manufacturer?: string;
+  ram?: string[];
+  processor?: string[];
+  storage?: string[];
+}
+
+export async function searchProducts(params: SearchParams): Promise<Product[]> {
+  try {
+    const searchParams = new URLSearchParams();
+    
+    // Add non-array parameters
+    if (params.query) searchParams.append('query', params.query);
+    if (params.category) searchParams.append('category', params.category);
+    if (params.minPrice !== undefined) searchParams.append('minPrice', params.minPrice.toString());
+    if (params.maxPrice !== undefined) searchParams.append('maxPrice', params.maxPrice.toString());
+    if (params.manufacturer) searchParams.append('manufacturer', params.manufacturer);
+    
+    // Add array parameters
+    if (params.ram?.length) {
+      params.ram.forEach(ram => {
+        // Ensure RAM values have 'GB' suffix if not already present
+        const ramValue = ram.endsWith('GB') ? ram : `${ram}GB`;
+        searchParams.append('spec.ram', ramValue);
+      });
+    }
+    if (params.processor?.length) params.processor.forEach(proc => searchParams.append('spec.processor', proc));
+    if (params.storage?.length) params.storage.forEach(storage => searchParams.append('spec.storage', storage));
+    
+    const queryString = searchParams.toString();
+    const url = `/api/catalog/search${queryString ? `?${queryString}` : ''}`;
+    
+    return await fetchApi<Product[]>(url);
+  } catch (error) {
+//     console.error('Error searching products:', error);
+    return [];
+  }
+}

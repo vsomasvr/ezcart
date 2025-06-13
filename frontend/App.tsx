@@ -10,7 +10,7 @@ import SignInView from './src/components/SignInView';
 import ChatToggleButton from './src/components/ChatToggleButton'; // New Import
 import ChatPanel from './src/components/ChatPanel'; // New Import
 import { Product, CartItem, DetailedCartItem, ChatMessage, View } from './src/types'; // Added ChatMessage, View
-import { getProducts } from './src/apiService';
+import { getProducts, searchProducts, SearchParams } from './src/apiService';
 import * as cartService from './src/cartService';
 import { parseRamToGB, parseStorageToGB } from './src/utils';
 
@@ -31,6 +31,7 @@ const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<View>('list');
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [displayedProducts, setDisplayedProducts] = useState<Product[]>([]);
+  const [isServerFiltering, setIsServerFiltering] = useState<boolean>(false);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -61,88 +62,130 @@ const App: React.FC = () => {
     });
   }, [currentView, selectedProductId]);
 
-  const fetchInitialProducts = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const fetchedProducts = await getProducts();
-      setAllProducts(fetchedProducts);
-      // setDisplayedProducts(fetchedProducts); // Let applyFilters handle this
-    } catch (err) {
-      setError('Failed to fetch products. Please try again later.');
-      console.error(err);
-      setAllProducts([]);
-      setDisplayedProducts([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
+  // Load products on component mount or when filters change
   useEffect(() => {
-    fetchInitialProducts();
-  }, [fetchInitialProducts]);
+    const loadProducts = async () => {
+      try {
+        setIsLoading(true);
+        // Only load all products if we're not using server-side filtering
+        if (!isServerFiltering || allProducts.length === 0) {
+          const products = await getProducts();
+          setAllProducts(products);
+          if (!isServerFiltering) {
+            setDisplayedProducts(products);
+          }
+        }
+      } catch (error) {
+        setError('Failed to load products. Please try again later.');
+        console.error('Error loading products:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const applyFilters = useCallback(() => {
-    // Only set loading if allProducts has been populated.
-    if (allProducts.length > 0) {
-      setIsLoading(true);
+    loadProducts();
+  }, [isServerFiltering]);
+
+  const applyFilters = useCallback(async () => {
+    if (allProducts.length === 0) {
+      setDisplayedProducts([]);
+      return;
     }
+
+    setIsLoading(true);
     
-    let productsToFilter = [...allProducts];
+    // Check if we have any active filters (except keyword which is handled by the backend)
+    const hasActiveFilters = 
+      activeFilters.category.length > 0 ||
+      activeFilters.manufacturer.length > 0 ||
+      activeFilters.processor.length > 0 ||
+      activeFilters.priceMin ||
+      activeFilters.priceMax ||
+      activeFilters.ram.length > 0 ||
+      activeFilters.storage.length > 0;
 
-    if (activeFilters.keyword) {
-      const keywordLower = activeFilters.keyword.toLowerCase();
-      productsToFilter = productsToFilter.filter(p =>
-        p.productName.toLowerCase().includes(keywordLower) ||
-        p.shortDescription.toLowerCase().includes(keywordLower) ||
-        p.longDescription.toLowerCase().includes(keywordLower) ||
-        p.manufacturer.toLowerCase().includes(keywordLower)
-      );
-    }
+    try {
+      if (hasActiveFilters || activeFilters.keyword) {
+        // Use server-side filtering
+        setIsServerFiltering(true);
+        
+        const searchParams: SearchParams = {
+          query: activeFilters.keyword || undefined,
+          category: activeFilters.category.length > 0 ? activeFilters.category[0] : undefined,
+          manufacturer: activeFilters.manufacturer.length > 0 ? activeFilters.manufacturer[0] : undefined,
+          minPrice: activeFilters.priceMin ? parseFloat(activeFilters.priceMin) : undefined,
+          maxPrice: activeFilters.priceMax ? parseFloat(activeFilters.priceMax) : undefined,
+          ram: activeFilters.ram.length > 0 ? activeFilters.ram : undefined,
+          processor: activeFilters.processor.length > 0 ? activeFilters.processor : undefined,
+          storage: activeFilters.storage.length > 0 ? activeFilters.storage : undefined
+        };
+        
+        const filteredProducts = await searchProducts(searchParams);
+        setDisplayedProducts(filteredProducts);
+      } else {
+        // No filters, show all products
+        setIsServerFiltering(false);
+        setDisplayedProducts([...allProducts]);
+      }
+    } catch (error) {
+      console.error('Error applying filters:', error);
+      // Fallback to client-side filtering if server fails
+      setIsServerFiltering(false);
+      let productsToFilter = [...allProducts];
 
-    if (activeFilters.category.length > 0) {
-      productsToFilter = productsToFilter.filter(p => activeFilters.category.includes(p.category));
-    }
+      if (activeFilters.keyword) {
+        const keywordLower = activeFilters.keyword.toLowerCase();
+        productsToFilter = productsToFilter.filter(p => 
+          p.productName.toLowerCase().includes(keywordLower) ||
+          p.shortDescription.toLowerCase().includes(keywordLower) ||
+          p.longDescription.toLowerCase().includes(keywordLower) ||
+          p.manufacturer.toLowerCase().includes(keywordLower)
+        );
+      }
 
-    if (activeFilters.manufacturer.length > 0) {
-      productsToFilter = productsToFilter.filter(p => activeFilters.manufacturer.includes(p.manufacturer));
-    }
-    
-    if (activeFilters.processor.length > 0) {
-      productsToFilter = productsToFilter.filter(p => {
-        const productProcessorLower = p.specifications.processor.toLowerCase();
-        return activeFilters.processor.some(filterProc => productProcessorLower.includes(filterProc.toLowerCase()));
-      });
-    }
+      if (activeFilters.category.length > 0) {
+        productsToFilter = productsToFilter.filter(p => activeFilters.category.includes(p.category));
+      }
 
-    const minPrice = parseFloat(activeFilters.priceMin);
-    const maxPrice = parseFloat(activeFilters.priceMax);
-    if (!isNaN(minPrice)) {
-      productsToFilter = productsToFilter.filter(p => p.price >= minPrice);
-    }
-    if (!isNaN(maxPrice)) {
-      productsToFilter = productsToFilter.filter(p => p.price <= maxPrice);
-    }
-
-    if (activeFilters.ram.length > 0) {
-      productsToFilter = productsToFilter.filter(p => {
-        const productRam = parseRamToGB(p.specifications.ram);
-        return activeFilters.ram.some(filterRam => productRam === parseInt(filterRam));
-      });
-    }
-
-    if (activeFilters.storage.length > 0) {
-      productsToFilter = productsToFilter.filter(p => {
-        const productStorage = parseStorageToGB(p.specifications.storage);
-        return activeFilters.storage.some(filterStorage => {
-            const filterStorageGB = parseStorageToGB(filterStorage); 
-            return productStorage === filterStorageGB;
+      if (activeFilters.manufacturer.length > 0) {
+        productsToFilter = productsToFilter.filter(p => activeFilters.manufacturer.includes(p.manufacturer));
+      }
+      
+      if (activeFilters.processor.length > 0) {
+        productsToFilter = productsToFilter.filter(p => {
+          const productProcessorLower = p.specifications.processor.toLowerCase();
+          return activeFilters.processor.some(filterProc => productProcessorLower.includes(filterProc.toLowerCase()));
         });
-      });
-    }
-    
-    setDisplayedProducts(productsToFilter);
-    if (allProducts.length > 0) { // Only stop loading if it was started
+      }
+
+      const minPrice = parseFloat(activeFilters.priceMin);
+      const maxPrice = parseFloat(activeFilters.priceMax);
+      if (!isNaN(minPrice)) {
+        productsToFilter = productsToFilter.filter(p => p.price >= minPrice);
+      }
+      if (!isNaN(maxPrice)) {
+        productsToFilter = productsToFilter.filter(p => p.price <= maxPrice);
+      }
+
+      if (activeFilters.ram.length > 0) {
+        productsToFilter = productsToFilter.filter(p => {
+          const productRam = parseRamToGB(p.specifications.ram);
+          return activeFilters.ram.some(filterRam => productRam === parseInt(filterRam));
+        });
+      }
+
+      if (activeFilters.storage.length > 0) {
+        productsToFilter = productsToFilter.filter(p => {
+          const productStorage = parseStorageToGB(p.specifications.storage);
+          return activeFilters.storage.some(filterStorage => {
+              const filterStorageGB = parseStorageToGB(filterStorage); 
+              return productStorage === filterStorageGB;
+          });
+        });
+      }
+      
+      setDisplayedProducts(productsToFilter);
+    } finally {
       setIsLoading(false);
     }
   }, [allProducts, activeFilters]);
