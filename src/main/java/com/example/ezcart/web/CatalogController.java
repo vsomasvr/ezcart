@@ -6,6 +6,7 @@ import com.example.ezcart.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -39,22 +40,22 @@ public class CatalogController {
     @GetMapping(value = "/search")
     public List<ProductListDTO> searchProducts(
             @RequestParam(name = "query", required = false) String query,
-            @RequestParam(name = "category", required = false) String category,
+            @RequestParam(name = "category", required = false) List<String> categories,
             @RequestParam(name = "minPrice", required = false) Double minPrice,
             @RequestParam(name = "maxPrice", required = false) Double maxPrice,
-            @RequestParam(name = "manufacturer", required = false) String manufacturer,
+            @RequestParam(name = "manufacturer", required = false) List<String> manufacturers,
             @RequestParam(name = "spec.ram", required = false) List<String> ramFilters,
             @RequestParam(name = "spec.processor", required = false) List<String> processorFilters,
             @RequestParam(name = "spec.storage", required = false) List<String> storageFilters) {
         return productService.searchProducts(
                 query,
-                category,
+                categories != null ? categories : Collections.emptyList(),
                 minPrice,
                 maxPrice,
-                manufacturer,
-                ramFilters,
-                processorFilters,
-                storageFilters
+                manufacturers != null ? manufacturers : Collections.emptyList(),
+                ramFilters != null ? ramFilters : Collections.emptyList(),
+                processorFilters != null ? processorFilters : Collections.emptyList(),
+                storageFilters != null ? storageFilters : Collections.emptyList()
         );
     }
 

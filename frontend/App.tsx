@@ -111,8 +111,8 @@ const App: React.FC = () => {
         
         const searchParams: SearchParams = {
           query: activeFilters.keyword || undefined,
-          category: activeFilters.category.length > 0 ? activeFilters.category[0] : undefined,
-          manufacturer: activeFilters.manufacturer.length > 0 ? activeFilters.manufacturer[0] : undefined,
+          category: activeFilters.category.length > 0 ? activeFilters.category : undefined,
+          manufacturer: activeFilters.manufacturer.length > 0 ? activeFilters.manufacturer : undefined,
           minPrice: activeFilters.priceMin ? parseFloat(activeFilters.priceMin) : undefined,
           maxPrice: activeFilters.priceMax ? parseFloat(activeFilters.priceMax) : undefined,
           ram: activeFilters.ram.length > 0 ? activeFilters.ram : undefined,

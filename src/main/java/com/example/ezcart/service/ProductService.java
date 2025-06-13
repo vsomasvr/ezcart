@@ -100,12 +100,23 @@ public class ProductService {
         ).toLowerCase();
     }
     
-    private boolean matchesCategory(Product product, String category) {
-        return product.category() != null && product.category().equalsIgnoreCase(category);
+    private boolean matchesCategory(Product product, List<String> categories) {
+        if (categories == null || categories.isEmpty()) {
+            return true;
+        }
+        return categories.stream().anyMatch(category -> 
+            (product.category() != null && product.category().equalsIgnoreCase(category)) ||
+            (product.subCategory() != null && product.subCategory().equalsIgnoreCase(category))
+        );
     }
     
-    private boolean matchesManufacturer(Product product, String manufacturer) {
-        return product.manufacturer() != null && product.manufacturer().equalsIgnoreCase(manufacturer);
+    private boolean matchesManufacturer(Product product, List<String> manufacturers) {
+        if (manufacturers == null || manufacturers.isEmpty()) {
+            return true;
+        }
+        return manufacturers.stream().anyMatch(manufacturer -> 
+            product.manufacturer() != null && product.manufacturer().equalsIgnoreCase(manufacturer)
+        );
     }
     
     private boolean matchesPrice(Product product, Double minPrice, Double maxPrice) {
@@ -159,18 +170,18 @@ public class ProductService {
 
     public List<ProductListDTO> searchProducts(
             String query, 
-            String category, 
+            List<String> categories, 
             Double minPrice, 
             Double maxPrice, 
-            String manufacturer,
+            List<String> manufacturers,
             List<String> ramFilters,
             List<String> processorFilters,
             List<String> storageFilters) {
         return products.stream()
                 .filter(product -> 
-                    (!StringUtils.hasLength(category) || matchesCategory(product, category)) &&
+                    matchesCategory(product, categories) &&
                     matchesPrice(product, minPrice, maxPrice) &&
-                    (!StringUtils.hasLength(manufacturer) || matchesManufacturer(product, manufacturer)) &&
+                    matchesManufacturer(product, manufacturers) &&
                     matchesRam(product, ramFilters) &&
                     matchesProcessor(product, processorFilters) &&
                     matchesStorage(product, storageFilters) &&

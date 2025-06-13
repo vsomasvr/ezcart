@@ -69,10 +69,10 @@ export async function getReviewsByProductId(productId: string): Promise<Review[]
 
 export interface SearchParams {
   query?: string;
-  category?: string;
+  category?: string[];
   minPrice?: number;
   maxPrice?: number;
-  manufacturer?: string;
+  manufacturer?: string[];
   ram?: string[];
   processor?: string[];
   storage?: string[];
@@ -84,10 +84,14 @@ export async function searchProducts(params: SearchParams): Promise<Product[]> {
     
     // Add non-array parameters
     if (params.query) searchParams.append('query', params.query);
-    if (params.category) searchParams.append('category', params.category);
+    if (params.category?.length) {
+      params.category.forEach(cat => searchParams.append('category', cat));
+    }
     if (params.minPrice !== undefined) searchParams.append('minPrice', params.minPrice.toString());
     if (params.maxPrice !== undefined) searchParams.append('maxPrice', params.maxPrice.toString());
-    if (params.manufacturer) searchParams.append('manufacturer', params.manufacturer);
+    if (params.manufacturer?.length) {
+      params.manufacturer.forEach(mfg => searchParams.append('manufacturer', mfg));
+    }
     
     // Add array parameters
     if (params.ram?.length) {
