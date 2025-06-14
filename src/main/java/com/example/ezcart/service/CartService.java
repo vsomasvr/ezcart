@@ -11,8 +11,18 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Service
 public class CartService {
+
     // In-memory storage: userId -> List of cart items
     private final Map<String, List<CartItem>> userCarts = new ConcurrentHashMap<>();
+
+    // --- Concurrency Strategy: ReentrantReadWriteLock ---
+    // A ReentrantReadWriteLock is used to ensure thread safety for cart operations.
+    // This strategy is chosen because cart modifications (e.g., adding an item) are
+    // complex "read-modify-write" operations that must be atomic.
+    // For example, adding an item requires first checking if it exists, then either
+    // updating its quantity or adding a new item. An explicit write lock ensures
+    // this entire sequence is performed without interruption from other threads.
+    // Read operations (like getting the cart) can happen concurrently.
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     public List<CartItem> getCart(String userId) {

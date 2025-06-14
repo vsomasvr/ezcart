@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ChatMessage } from '../types';
 
@@ -9,7 +8,8 @@ interface ChatMessageBubbleProps {
 
 const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message, currentUser }) => {
   const isUser = message.sender === 'user';
-  const time = message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  // Convert the ISO string timestamp from the backend into a Date object before formatting.
+  const time = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   // Basic avatar from username initials
   const getInitials = (name: string | null) => {

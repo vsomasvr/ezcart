@@ -70,9 +70,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Allow all requests to paths starting with /api/public/ to be publicly accessible.
                         // This matches paths like /api/public/data, /api/public/status, etc.
-                        .requestMatchers("/", "/index.html", "/assets/**", "/api/public/**").permitAll()
-                        // All other requests require authentication.
-                        .anyRequest().authenticated()
+                        .requestMatchers("/public/**", "/error").permitAll()
+                        // Secure API endpoints that require authentication.
+                        .requestMatchers("/api/**").authenticated()
+                        // Allow all other requests (e.g., for serving the frontend). This is a fallback.
+                        .anyRequest().permitAll()
                 )
                 // Configure HttpBasic authentication.
                 .httpBasic(httpBasic -> httpBasic
@@ -109,14 +111,14 @@ public class SecurityConfig {
         // Define the first demo user.
         UserDetails user1 = User.builder()
                 .username("demoUser")
-                .password(passwordEncoder().encode("****")) // Encode the password.
+                .password(passwordEncoder().encode("demoPass123")) // Encode the password.
                 .roles("USER") // Assign the "USER" role.
                 .build();
 
         // Define the second test user.
         UserDetails user2 = User.builder()
                 .username("testUser")
-                .password(passwordEncoder().encode("****")) // Encode the password.
+                .password(passwordEncoder().encode("testPass123")) // Encode the password.
                 .roles("USER") // Assign the "USER" role.
                 .build();
 

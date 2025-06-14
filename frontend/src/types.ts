@@ -1,4 +1,3 @@
-
 export interface Specifications {
   processor: string;
   graphicsCard: string;
@@ -62,7 +61,7 @@ export interface ChatMessage {
   id: string;
   text: string;
   sender: 'user' | 'ai';
-  timestamp: Date;
+  timestamp: string; // Use string to match backend's Instant/ISO format
 }
 
 export type View = 'list' | 'detail' | 'cart' | 'signIn';

@@ -13,6 +13,7 @@ import { Product, CartItem, DetailedCartItem, ChatMessage, View } from './src/ty
 import { getProducts, searchProducts, SearchParams } from './src/apiService';
 import cartService from './src/cartService';
 import authService from './src/services/authService';
+import chatService from './src/services/chatService';
 import { parseRamToGB, parseStorageToGB } from './src/utils';
 
 // --- STATE MANAGEMENT --- //
@@ -111,6 +112,27 @@ const App: React.FC = () => {
 
     loadCart();
   }, [currentUser]);
+
+  // --- CHAT DATA EFFECT --- //
+  // This effect loads the user's chat history from the backend when they log in.
+  useEffect(() => {
+    const loadChatHistory = async () => {
+      if (currentUser) {
+        try {
+          const history = await chatService.getHistory();
+          setChatMessages(history);
+        } catch (err) {
+          console.error("Failed to load chat history:", err);
+        }
+      } else {
+        setChatMessages([]); // Clear history on logout
+      }
+    };
+
+    if (!isAuthLoading) { // Only run after initial auth check
+      loadChatHistory();
+    }
+  }, [currentUser, isAuthLoading]);
 
   // --- UI & DATA LOGIC --- //
   // Scrolls the window to the top whenever the view changes.
@@ -398,26 +420,30 @@ const App: React.FC = () => {
     setIsChatPanelOpen(prev => !prev);
   };
 
-  const handleSendMessage = (messageText: string) => {
-    if (!messageText.trim()) return;
+  const handleSendMessage = async (messageText: string) => {
+    if (!messageText.trim() || !currentUser) return;
 
-    const newUserMessage: ChatMessage = {
-      id: Date.now().toString() + '-user',
+    // Optimistically add the user's message for a responsive UI.
+    const optimisticUserMessage: ChatMessage = {
+      id: `temp-${Date.now()}`,
       text: messageText,
       sender: 'user',
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
     };
-    setChatMessages(prev => [...prev, newUserMessage]);
+    setChatMessages(prev => [...prev, optimisticUserMessage]);
 
-    setTimeout(() => {
-      const aiResponse: ChatMessage = {
-        id: Date.now().toString() + '-ai',
-        text: "Thanks for your message! I'm processing your request.",
-        sender: 'ai',
-        timestamp: new Date(),
-      };
-      setChatMessages(prev => [...prev, aiResponse]);
-    }, 1000);
+    try {
+      // Send the message and wait for the AI response.
+      await chatService.sendMessage(messageText);
+      // After the backend confirms, refresh the entire history to ensure consistency.
+      const updatedHistory = await chatService.getHistory();
+      setChatMessages(updatedHistory);
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      setError('Could not send your message. Please try again.');
+      // On failure, remove the optimistic message.
+      setChatMessages(prev => prev.filter(m => m.id !== optimisticUserMessage.id));
+    }
   };
 
   // --- VIEW RENDERING --- //
