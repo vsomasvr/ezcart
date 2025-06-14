@@ -11,7 +11,7 @@ import ChatPanel from './src/components/ChatPanel';
 
 import { Product, CartItem, DetailedCartItem, ChatMessage, View } from './src/types';
 import { getProducts, searchProducts, SearchParams } from './src/apiService';
-import * as cartService from './src/cartService';
+import cartService from './src/cartService';
 import authService from './src/services/authService';
 import { parseRamToGB, parseStorageToGB } from './src/utils';
 
@@ -43,8 +43,8 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   // Holds application-wide error messages
   const [error, setError] = useState<string | null>(null);
-  // Manages items in the shopping cart
-  const [cartItems, setCartItems] = useState<CartItem[]>(cartService.getCartItems());
+  // Manages items in the shopping cart - now fetched from the backend.
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   
   // Authentication state
   // Stores the name of the logged-in user
@@ -87,6 +87,30 @@ const App: React.FC = () => {
     // Trigger both asynchronous operations on startup.
     checkCurrentUser();
   }, []);
+
+  // --- CART DATA EFFECT --- //
+  // This effect synchronizes the cart state with the backend whenever the user logs in or out.
+  useEffect(() => {
+    const loadCart = async () => {
+      if (currentUser) {
+        try {
+          setIsLoading(true);
+          const items = await cartService.getCart();
+          setCartItems(items);
+        } catch (err) {
+          console.error("Failed to load cart:", err);
+          setError("Could not load your cart. Please try again.");
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        // If there's no user, the cart is empty.
+        setCartItems([]);
+      }
+    };
+
+    loadCart();
+  }, [currentUser]);
 
   // --- UI & DATA LOGIC --- //
   // Scrolls the window to the top whenever the view changes.
@@ -258,24 +282,46 @@ const App: React.FC = () => {
     setCurrentView('list');
   };
 
-  const handleAddToCart = (productId: string) => {
-    const updatedCart = cartService.addProductToCart(productId);
-    setCartItems(updatedCart);
+  const handleAddToCart = async (productId: string) => {
+    try {
+      const updatedCart = await cartService.addToCart(productId);
+      setCartItems(updatedCart);
+    } catch (error) {
+      console.error('Failed to add to cart:', error);
+      setError('There was an issue adding the item to your cart.');
+    }
   };
 
-  const handleRemoveFromCart = (productId: string) => {
-    const updatedCart = cartService.removeProductFromCart(productId);
-    setCartItems(updatedCart);
+  const handleRemoveFromCart = async (productId: string) => {
+    try {
+      await cartService.removeFromCart(productId);
+      // Refetch the cart to ensure consistency with the backend.
+      const updatedCart = await cartService.getCart();
+      setCartItems(updatedCart);
+    } catch (error) {
+      console.error('Failed to remove from cart:', error);
+      setError('There was an issue removing the item from your cart.');
+    }
   };
 
-  const handleUpdateCartQuantity = (productId: string, quantity: number) => {
-    const updatedCart = cartService.updateProductQuantity(productId, quantity);
-    setCartItems(updatedCart);
+  const handleUpdateCartQuantity = async (productId: string, quantity: number) => {
+    try {
+      const updatedCart = await cartService.updateItemQuantity(productId, quantity);
+      setCartItems(updatedCart);
+    } catch (error) {
+      console.error('Failed to update cart quantity:', error);
+      setError('There was an issue updating your cart.');
+    }
   };
 
-  const handleClearCart = () => {
-    const updatedCart = cartService.clearCart();
-    setCartItems(updatedCart);
+  const handleClearCart = async () => {
+    try {
+      await cartService.clearCart();
+      setCartItems([]);
+    } catch (error) {
+      console.error('Failed to clear cart:', error);
+      setError('Could not clear your cart.');
+    }
   };
 
   const handleShowCartView = () => {
@@ -315,15 +361,20 @@ const App: React.FC = () => {
     }
   };
 
-
   
   const handleSignOut = async () => {
-    await authService.logout();
-    setCurrentUser(null);
-    setCartItems(cartService.clearCart()); 
-    setIsChatPanelOpen(false); 
-    setChatMessages([]); 
-    handleShowList(); 
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Optionally, you could show an error message to the user here.
+    } finally {
+      setCurrentUser(null);
+      setIsChatPanelOpen(false);
+      setChatMessages([]);
+      handleShowList();
+      window.location.reload();
+    }
   };
 
   const detailedCartItems: DetailedCartItem[] = useMemo(() => {
@@ -338,6 +389,10 @@ const App: React.FC = () => {
       };
     }).filter(item => item.name !== 'Product not found');
   }, [cartItems, allProducts]);
+
+  const totalCartQuantity = useMemo(() => {
+    return cartItems.reduce((total, item) => total + item.quantity, 0);
+  }, [cartItems]);
 
   const toggleChatPanel = () => {
     setIsChatPanelOpen(prev => !prev);
@@ -458,7 +513,7 @@ const App: React.FC = () => {
         onShowList={handleShowList} 
         onSearch={handleKeywordSearch} 
         currentSearchTerm={activeFilters.keyword}
-        cartItemCount={cartService.getTotalQuantityInCart()}
+        cartItemCount={totalCartQuantity}
         onShowCartView={handleShowCartView}
         currentUser={currentUser} 
         onSignOut={handleSignOut}

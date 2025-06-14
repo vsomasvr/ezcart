@@ -1,73 +1,58 @@
+import api from './axiosConfig';
+import { CartItem } from './types';
 
-import { CartItem, Product } from './types';
+const cartService = {
+  /**
+   * Fetches the user's cart from the backend.
+   */
+  async getCart(): Promise<CartItem[]> {
+    const response = await api.get<CartItem[]>('/cart');
+    return response.data;
+  },
 
-const CART_STORAGE_KEY = 'ezCart';
+  /**
+   * Adds a product to the cart. The backend handles quantity incrementing.
+   */
+  async addToCart(productId: string): Promise<CartItem[]> {
+    const response = await api.post<CartItem[]>('/cart/items', { productId, quantity: 1 });
+    return response.data;
+  },
 
-export const getCartItems = (): CartItem[] => {
-  try {
-    const storedCart = localStorage.getItem(CART_STORAGE_KEY);
-    return storedCart ? JSON.parse(storedCart) : [];
-  } catch (error) {
-    console.error("Error reading cart from localStorage:", error);
-    return [];
-  }
-};
+  /**
+   * Updates the quantity of a specific item in the cart.
+   * The backend is expected to remove the item if quantity is 0.
+   */
+  async updateItemQuantity(productId: string, quantity: number): Promise<CartItem[]> {
+    const response = await api.put<CartItem[]>(`/cart/items/${productId}`, null, { params: { quantity } });
+    return response.data;
+  },
 
-const saveCartItems = (cartItems: CartItem[]): void => {
-  try {
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
-  } catch (error) {
-    console.error("Error saving cart to localStorage:", error);
-  }
-};
+  /**
+   * Removes an item from the cart completely.
+   * Returns void; the component should refetch the cart.
+   */
+  async removeFromCart(productId: string): Promise<void> {
+    await api.delete(`/cart/items/${productId}`);
+  },
 
-export const addProductToCart = (productId: string): CartItem[] => {
-  const cartItems = getCartItems();
-  const existingItemIndex = cartItems.findIndex(item => item.productId === productId);
+  /**
+   * Clears the entire cart on the backend.
+   * Returns void; the component should refetch the cart.
+   */
+  async clearCart(): Promise<void> {
+    await api.delete('/cart');
+  },
 
-  if (existingItemIndex > -1) {
-    cartItems[existingItemIndex].quantity += 1;
-  } else {
-    cartItems.push({ productId, quantity: 1 });
-  }
-  saveCartItems(cartItems);
-  return cartItems;
-};
-
-export const removeProductFromCart = (productId: string): CartItem[] => {
-  let cartItems = getCartItems();
-  cartItems = cartItems.filter(item => item.productId !== productId);
-  saveCartItems(cartItems);
-  return cartItems;
-};
-
-export const updateProductQuantity = (productId: string, quantity: number): CartItem[] => {
-  let cartItems = getCartItems();
-  const itemIndex = cartItems.findIndex(item => item.productId === productId);
-
-  if (itemIndex > -1) {
-    if (quantity <= 0) {
-      cartItems = cartItems.filter(item => item.productId !== productId);
-    } else {
-      cartItems[itemIndex].quantity = quantity;
+  /**
+   * Merges a local cart with the server-side cart after login.
+   */
+  async mergeCart(localCartItems: CartItem[]): Promise<CartItem[]> {
+    if (localCartItems.length === 0) {
+      return this.getCart();
     }
-    saveCartItems(cartItems);
-  }
-  return cartItems;
+    const response = await api.post<CartItem[]>('/cart/merge', localCartItems);
+    return response.data;
+  },
 };
 
-export const clearCart = (): CartItem[] => {
-  const emptyCart: CartItem[] = [];
-  saveCartItems(emptyCart);
-  return emptyCart;
-};
-
-export const getCartItemCount = (): number => {
-  // Returns the total number of unique items in the cart
-  return getCartItems().length;
-};
-
-export const getTotalQuantityInCart = (): number => {
-  // Returns the total sum of quantities of all items
-  return getCartItems().reduce((total, item) => total + item.quantity, 0);
-};
+export default cartService;
