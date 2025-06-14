@@ -9,6 +9,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -20,12 +21,23 @@ import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
 @EnableWebSecurity // Enables Spring Security's web security support and provides the Spring Security integration with the Spring Web MVC.
 public class SecurityConfig {
+
+    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
+
+    @Value("${app.security.users:user:password:USER}")
+    private String users;
 
     /**
      * Configures the security filter chain.
@@ -104,26 +116,49 @@ public class SecurityConfig {
      * Provides an in-memory user details service for demonstration purposes.
      * In a production application, this would typically be backed by a database.
      *
-     * @return An InMemoryUserDetailsManager with predefined users.
+     * @param passwordEncoder The PasswordEncoder to encode the user's password.
+     * @return A UserDetailsService containing the demo user.
      */
     @Bean
-    public UserDetailsService userDetailsService() {
-        // Define the first demo user.
-        UserDetails user1 = User.builder()
-                .username("demoUser")
-                .password(passwordEncoder().encode("demoPass123")) // Encode the password.
-                .roles("USER") // Assign the "USER" role.
-                .build();
+    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
+        log.info("Loading users from properties...");
+        List<UserDetails> userDetailsList = new ArrayList<>();
 
-        // Define the second test user.
-        UserDetails user2 = User.builder()
-                .username("testUser")
-                .password(passwordEncoder().encode("testPass123")) // Encode the password.
-                .roles("USER") // Assign the "USER" role.
-                .build();
+        // Split the users string by semicolon to get individual user definitions.
+        String[] userDefinitions = users.split(";");
 
-        // Return an InMemoryUserDetailsManager with the defined users.
-        return new InMemoryUserDetailsManager(user1, user2);
+        for (String userDefinition : userDefinitions) {
+            // Split each definition by colon to get username, password, and roles.
+            String[] parts = userDefinition.split(":", 3);
+            if (parts.length == 3) {
+                String username = parts[0].trim();
+                String password = parts[1].trim();
+                String[] roles = parts[2].trim().split(",");
+
+                if (username.isEmpty() || password.isEmpty()) {
+                    log.warn("Skipping user with empty username or password: {}", userDefinition);
+                    continue;
+                }
+
+                UserDetails user = User.builder()
+                        .username(username)
+                        .password(passwordEncoder.encode(password))
+                        .roles(roles)
+                        .build();
+                userDetailsList.add(user);
+                log.info("Loaded user '{}' with roles {}", username, Arrays.toString(roles));
+            } else {
+                log.warn("Skipping malformed user entry: {}", userDefinition);
+            }
+        }
+
+        if (userDetailsList.isEmpty()) {
+            log.error("No valid users were loaded from properties. Please check the 'app.security.users' configuration.");
+            // Return a manager with no users, effectively locking the system.
+            return new InMemoryUserDetailsManager();
+        }
+
+        return new InMemoryUserDetailsManager(userDetailsList);
     }
 
     /**
