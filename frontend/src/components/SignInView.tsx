@@ -40,7 +40,7 @@ const SignInView: React.FC<SignInViewProps> = ({ onSignIn, onCancel, error, isLo
                 autoComplete="username"
                 required
                 className="appearance-none rounded-md relative block w-full px-3 py-3 border border-slate-600 bg-slate-700 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm"
-                placeholder="Username (e.g., demoUser)"
+                placeholder="Username (e.g., demo)"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
@@ -56,7 +56,7 @@ const SignInView: React.FC<SignInViewProps> = ({ onSignIn, onCancel, error, isLo
                 autoComplete="current-password"
                 required
                 className="appearance-none rounded-md relative block w-full px-3 py-3 border border-slate-600 bg-slate-700 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 focus:z-10 sm:text-sm"
-                placeholder="Password (e.g., demoPass123)"
+                placeholder="Password (e.g., demo)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />

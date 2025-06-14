@@ -109,14 +109,14 @@ public class SecurityConfig {
         // Define the first demo user.
         UserDetails user1 = User.builder()
                 .username("demoUser")
-                .password(passwordEncoder().encode("demoPass123")) // Encode the password.
+                .password(passwordEncoder().encode("****")) // Encode the password.
                 .roles("USER") // Assign the "USER" role.
                 .build();
 
         // Define the second test user.
         UserDetails user2 = User.builder()
                 .username("testUser")
-                .password(passwordEncoder().encode("testPass123")) // Encode the password.
+                .password(passwordEncoder().encode("****")) // Encode the password.
                 .roles("USER") // Assign the "USER" role.
                 .build();
 
