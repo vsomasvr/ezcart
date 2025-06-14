@@ -1,68 +1,51 @@
+import api from './axiosConfig';
 import { Product, Review } from './types';
 
-// Base URL is empty because we're using full paths with /api prefix
-const API_BASE_URL = '';
-
-async function fetchApi<T>(url: string, options: RequestInit = {}): Promise<T> {
-  try {
-    // Add timestamp to prevent caching
-    const timestamp = new Date().getTime();
-    const separator = url.includes('?') ? '&' : '?';
-    const urlWithCacheBust = `${API_BASE_URL}${url}${separator}_t=${timestamp}`;
-    
-    const response = await fetch(urlWithCacheBust, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-      ...options,
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return (await response.json()) as T;
-  } catch (error) {
-//     console.error('API call failed:', error);
-    throw error;
-  }
-}
+// Add a request interceptor to add a cache-busting parameter
+api.interceptors.request.use(config => {
+  const newParams = new URLSearchParams(config.params as Record<string, string>);
+  newParams.append('_t', new Date().getTime().toString());
+  config.params = newParams;
+  return config;
+});
 
 export async function getProducts(): Promise<Product[]> {
   try {
-    return await fetchApi<Product[]>('/api/catalog/products');
+    const response = await api.get<Product[]>('/catalog/products');
+    return response.data;
   } catch (error) {
-//     console.error('Failed to fetch products:', error);
+    console.error('Failed to fetch products:', error);
     return [];
   }
 }
 
 export async function getProductById(id: string): Promise<Product | undefined> {
   try {
-    const response = await fetchApi<Product>(`/api/catalog/products/${id}`);
-    return response || undefined;
+    const response = await api.get<Product>(`/catalog/products/${id}`);
+    return response.data;
   } catch (error) {
-//     console.error(`Failed to fetch product with id ${id}:`, error);
+    console.error(`Failed to fetch product with id ${id}:`, error);
     return undefined;
   }
 }
 
 export async function searchProductsByCategory(category: string): Promise<Product[]> {
-  try {
-    const encodedCategory = encodeURIComponent(category);
-    return await fetchApi<Product[]>(`/api/catalog/products/category/${encodedCategory}`);
-  } catch (error) {
-//     console.error(`Failed to search products by category ${category}:`, error);
-    return [];
-  }
+    try {
+        const encodedCategory = encodeURIComponent(category);
+        const response = await api.get<Product[]>(`/catalog/products/category/${encodedCategory}`);
+        return response.data;
+    } catch (error) {
+        console.error(`Failed to search products by category ${category}:`, error);
+        return [];
+    }
 }
+
 export async function getReviewsByProductId(productId: string): Promise<Review[]> {
   try {
-    const response = await fetchApi<Review[]>(`/api/reviews/product/${productId}`);
-    return response || [];
+    const response = await api.get<Review[]>(`/reviews/product/${productId}`);
+    return response.data || [];
   } catch (error) {
-//     console.error(`Failed to fetch reviews for product ${productId}:`, error);
+    console.error(`Failed to fetch reviews for product ${productId}:`, error);
     return [];
   }
 }
@@ -79,37 +62,34 @@ export interface SearchParams {
 }
 
 export async function searchProducts(params: SearchParams): Promise<Product[]> {
-  try {
-    const searchParams = new URLSearchParams();
-    
-    // Add non-array parameters
-    if (params.query) searchParams.append('query', params.query);
-    if (params.category?.length) {
-      params.category.forEach(cat => searchParams.append('category', cat));
+    try {
+        const searchParams = new URLSearchParams();
+        
+        if (params.query) searchParams.append('query', params.query);
+        if (params.category?.length) {
+          params.category.forEach(cat => searchParams.append('category', cat));
+        }
+        if (params.minPrice !== undefined) searchParams.append('minPrice', params.minPrice.toString());
+        if (params.maxPrice !== undefined) searchParams.append('maxPrice', params.maxPrice.toString());
+        if (params.manufacturer?.length) {
+          params.manufacturer.forEach(mfg => searchParams.append('manufacturer', mfg));
+        }
+        
+        if (params.ram?.length) {
+          params.ram.forEach(ram => {
+            const ramValue = ram.endsWith('GB') ? ram : `${ram}GB`;
+            searchParams.append('spec.ram', ramValue);
+          });
+        }
+        if (params.processor?.length) params.processor.forEach(proc => searchParams.append('spec.processor', proc));
+        if (params.storage?.length) params.storage.forEach(storage => searchParams.append('spec.storage', storage));
+        
+        const response = await api.get<Product[]>('/catalog/search', {
+            params: searchParams,
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error searching products:', error);
+        return [];
     }
-    if (params.minPrice !== undefined) searchParams.append('minPrice', params.minPrice.toString());
-    if (params.maxPrice !== undefined) searchParams.append('maxPrice', params.maxPrice.toString());
-    if (params.manufacturer?.length) {
-      params.manufacturer.forEach(mfg => searchParams.append('manufacturer', mfg));
-    }
-    
-    // Add array parameters
-    if (params.ram?.length) {
-      params.ram.forEach(ram => {
-        // Ensure RAM values have 'GB' suffix if not already present
-        const ramValue = ram.endsWith('GB') ? ram : `${ram}GB`;
-        searchParams.append('spec.ram', ramValue);
-      });
-    }
-    if (params.processor?.length) params.processor.forEach(proc => searchParams.append('spec.processor', proc));
-    if (params.storage?.length) params.storage.forEach(storage => searchParams.append('spec.storage', storage));
-    
-    const queryString = searchParams.toString();
-    const url = `/api/catalog/search${queryString ? `?${queryString}` : ''}`;
-    
-    return await fetchApi<Product[]>(url);
-  } catch (error) {
-//     console.error('Error searching products:', error);
-    return [];
-  }
 }

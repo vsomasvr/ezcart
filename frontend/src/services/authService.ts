@@ -1,53 +1,26 @@
-import axios from 'axios';
-
-const API_BASE_URL = '/api';
-
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  withCredentials: true,
-});
-
-/**
- * Logs in the user using Basic Authentication.
- * @param username The user's username.
- * @param password The user's password.
- * @returns The username if login is successful.
- */
-export const login = async (username, password) => {
-  const response = await api.get('/auth/user', {
-    auth: {
-      username,
-      password,
-    },
-  });
-  return response.data;
-};
-
-/**
- * Logs out the current user.
- */
-export const logout = async () => {
-  await api.post('/auth/logout');
-};
-
-/**
- * Gets the currently authenticated user.
- * @returns The username if a user is authenticated, otherwise null.
- */
-export const getCurrentUser = async () => {
-  try {
-    const response = await api.get('/auth/user');
-    return response.data || null;
-  } catch (error) {
-    console.error('Error fetching current user:', error);
-    return null;
-  }
-};
+import api from '../axiosConfig';
 
 const authService = {
-  login,
-  logout,
-  getCurrentUser,
+  login: async (username, password) => {
+    // Use Basic Auth for the login request
+    const response = await api.get('/auth/user', {
+      auth: {
+        username,
+        password,
+      },
+    });
+    return response.data; // The backend should return the user object
+  },
+
+  logout: async () => {
+    await api.post('/auth/logout');
+  },
+
+  getCurrentUser: async () => {
+    // This request relies on the session cookie being sent automatically
+    const response = await api.get('/auth/user');
+    return response.data;
+  },
 };
 
 export default authService;

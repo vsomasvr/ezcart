@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,6 +13,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.HeaderWriterLogoutHandler;
+import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.Arrays;
@@ -39,7 +45,8 @@ public class SecurityConfig {
                     CorsConfiguration config = new CorsConfiguration();
                     // Define allowed origins for your frontend applications.
                     config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:8080",
-                            "http://localhost:7070", "http://localhost:9090", "http://localhost:5173", "http://localhost:8000"));
+                            "http://localhost:7070", "http://localhost:9090",
+                            "http://localhost:5173", "http://localhost:8000"));
                     // Define allowed HTTP methods.
                     config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     // Allow all headers.
@@ -48,25 +55,33 @@ public class SecurityConfig {
                     config.setAllowCredentials(true);
                     return config;
                 }))
-                // Disable CSRF (Cross-Site Request Forgery) protection.
-                // This is often done for stateless REST APIs where tokens (like JWT) are used
-                // or for simple demos where CSRF isn't a primary concern.
+                // Add the custom logging filter before the standard authentication filter.
+                .addFilterBefore(new SecurityContextLoggingFilter(), UsernamePasswordAuthenticationFilter.class)
+                // Disable CSRF protection. This is common for stateless REST APIs.
+                // In a real-world application, you would likely want to configure CSRF protection.
                 .csrf(csrf -> csrf.disable())
+                // Explicitly configure the SecurityContextRepository to ensure session persistence.
+                .securityContext(context -> context
+                    .securityContextRepository(new HttpSessionSecurityContextRepository()))
+                // Configure session management to create a session if required for authentication.
+                .sessionManagement(session -> session
+                    .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 // Configure authorization rules for HTTP requests.
                 .authorizeHttpRequests(auth -> auth
                         // Allow all requests to paths starting with /api/public/ to be publicly accessible.
                         // This matches paths like /api/public/data, /api/public/status, etc.
-                        .requestMatchers("/api/public/**").permitAll()
+                        .requestMatchers("/", "/index.html", "/assets/**", "/api/public/**").permitAll()
                         // All other requests require authentication.
                         .anyRequest().authenticated()
                 )
-                // Enable HTTP Basic authentication.
-                // This will prompt users for a username and password via a browser pop-up.
-                .httpBasic(httpBasic -> {}) // Empty lambda to simply enable HTTP Basic
+                // Configure HttpBasic authentication.
+                .httpBasic(httpBasic -> httpBasic
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(org.springframework.http.HttpStatus.UNAUTHORIZED)))
                 // Configure logout behavior.
                 .logout(logout -> logout
                         // Set the logout URL.
                         .logoutUrl("/api/auth/logout")
+                        .addLogoutHandler(new HeaderWriterLogoutHandler(new ClearSiteDataHeaderWriter(ClearSiteDataHeaderWriter.Directive.ALL)))
                         // Define a custom logout success handler.
                         .logoutSuccessHandler((request, response, authentication) -> {
                             // Set HTTP status to 200 (OK) on successful logout.

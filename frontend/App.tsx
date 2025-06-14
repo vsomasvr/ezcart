@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Navbar from './src/components/Navbar';
 import ProductList from './src/components/ProductList';
@@ -7,13 +6,17 @@ import LoadingSpinner from './src/components/LoadingSpinner';
 import FilterPanel from './src/components/FilterPanel';
 import CartView from './src/components/CartView';
 import SignInView from './src/components/SignInView';
-import ChatToggleButton from './src/components/ChatToggleButton'; // New Import
-import ChatPanel from './src/components/ChatPanel'; // New Import
-import { Product, CartItem, DetailedCartItem, ChatMessage, View } from './src/types'; // Added ChatMessage, View
+import ChatToggleButton from './src/components/ChatToggleButton';
+import ChatPanel from './src/components/ChatPanel';
+
+import { Product, CartItem, DetailedCartItem, ChatMessage, View } from './src/types';
 import { getProducts, searchProducts, SearchParams } from './src/apiService';
 import * as cartService from './src/cartService';
+import authService from './src/services/authService';
 import { parseRamToGB, parseStorageToGB } from './src/utils';
 
+// --- STATE MANAGEMENT --- //
+// Core application state
 export interface ActiveFilters {
   keyword: string;
   category: string[];
@@ -25,37 +28,68 @@ export interface ActiveFilters {
   storage: string[];
 }
 
-const ALLOWED_USERS = ["demoUser", "testUser", "devUser", "ezUser"];
-
 const App: React.FC = () => {
+  // Manages the currently displayed view (e.g., list, detail, cart)
   const [currentView, setCurrentView] = useState<View>('list');
+  // Master list of all products fetched from the server
   const [allProducts, setAllProducts] = useState<Product[]>([]);
+  // The subset of products to be displayed after filtering
   const [displayedProducts, setDisplayedProducts] = useState<Product[]>([]);
+  // Flag to determine if filtering is client-side or server-side
   const [isServerFiltering, setIsServerFiltering] = useState<boolean>(false);
+  // Holds the ID of the product being viewed in detail
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  // Global loading indicator for asynchronous operations
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  // Holds application-wide error messages
   const [error, setError] = useState<string | null>(null);
+  // Manages items in the shopping cart
   const [cartItems, setCartItems] = useState<CartItem[]>(cartService.getCartItems());
+  
+  // Authentication state
+  // Stores the name of the logged-in user
   const [currentUser, setCurrentUser] = useState<string | null>(null);
+  // Error message for the sign-in form
   const [signInError, setSignInError] = useState<string | null>(null);
+  // Loading state specifically for authentication
+  const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true); // Start true for initial check
 
-  // Chat State
+  // Chat state
+  // Toggles the visibility of the chat panel
   const [isChatPanelOpen, setIsChatPanelOpen] = useState<boolean>(false);
+  // Stores the history of chat messages
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
+  // Filter state
   const initialFilters: ActiveFilters = {
-    keyword: '',
-    category: [],
-    manufacturer: [],
-    processor: [],
-    priceMin: '',
-    priceMax: '',
-    ram: [],
-    storage: [],
+    keyword: '', category: [], manufacturer: [], processor: [],
+    priceMin: '', priceMax: '', ram: [], storage: [],
   };
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>(initialFilters);
 
-  // Effect to scroll to top when view changes
+  // --- INITIALIZATION EFFECT --- //
+  // This effect runs once when the App component mounts to fetch essential data.
+  useEffect(() => {
+    // 1. Checks for an active user session on the backend.
+    const checkCurrentUser = async () => {
+      try {
+        const user = await authService.getCurrentUser();
+        if (user) {
+          setCurrentUser(user); // If a session exists, set the current user.
+        }
+      } catch (err) {
+        setCurrentUser(null); // On failure, ensure no user is set.
+      } finally {
+        setIsAuthLoading(false); // Authentication check is complete.
+      }
+    };
+
+    // Trigger both asynchronous operations on startup.
+    checkCurrentUser();
+  }, []);
+
+  // --- UI & DATA LOGIC --- //
+  // Scrolls the window to the top whenever the view changes.
   useEffect(() => {
     requestAnimationFrame(() => {
       window.scrollTo(0, 0);
@@ -63,6 +97,10 @@ const App: React.FC = () => {
   }, [currentView, selectedProductId]);
 
   // Load products on component mount or when filters change
+  // This is a React useEffect hook. The code inside it runs after the component renders.
+  //  The [isServerFiltering] part is the "dependency array."
+  //  It tells React to re-run this effect automatically whenever the value of isServerFiltering changes.
+  //  This allows the component to react to changes in how filtering is handled.
   useEffect(() => {
     const loadProducts = async () => {
       try {
@@ -249,17 +287,38 @@ const App: React.FC = () => {
     setCurrentView('signIn');
   };
 
-  const handleSignIn = (username: string) => {
-    if (ALLOWED_USERS.includes(username)) {
-      setCurrentUser(username);
-      setSignInError(null);
+  const handleSignIn = async (username, password) => {
+    setIsAuthLoading(true);
+    setSignInError(null);
+    try {
+      const user = await authService.login(username, password);
+      setCurrentUser(user);
       setCurrentView('list');
-    } else {
-      setSignInError("Invalid username. Please try one of: " + ALLOWED_USERS.join(', '));
+      loadProducts();
+    } catch (err) {
+      setSignInError('Invalid username or password.');
+    } finally {
+      setIsAuthLoading(false);
     }
   };
+
+  const loadProducts = async () => {
+    try {
+      setIsLoading(true);
+      const products = await getProducts();
+      setAllProducts(products); // Store the master product list.
+      setDisplayedProducts(products); // Initially, display all products.
+    } catch (error) {
+      setError('Failed to load products. Please try again later.');
+    } finally {
+      setIsLoading(false); // Product loading is complete.
+    }
+  };
+
+
   
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
+    await authService.logout();
     setCurrentUser(null);
     setCartItems(cartService.clearCart()); 
     setIsChatPanelOpen(false); 
@@ -306,15 +365,25 @@ const App: React.FC = () => {
     }, 1000);
   };
 
+  // --- VIEW RENDERING --- //
+  // Determines which main component to render based on the current application state.
   const renderContent = () => {
+    // Display a loading spinner during the initial auth check.
+    if (isAuthLoading) {
+      return <LoadingSpinner />;
+    }
+
+    // Render the sign-in page.
     if (currentView === 'signIn') {
         return <SignInView 
                     onSignIn={handleSignIn} 
                     onCancel={handleShowList} 
                     error={signInError} 
+                    isLoading={isAuthLoading}
                 />;
     }
     
+    // Render the product detail page.
     if (currentView === 'detail') {
       if (selectedProductId) {
         return <ProductDetail 
@@ -328,6 +397,7 @@ const App: React.FC = () => {
       return <LoadingSpinner />;
     }
 
+    // Render the cart view.
     if (currentView === 'cart') { 
         return <CartView
             cartItems={detailedCartItems}
@@ -380,6 +450,8 @@ const App: React.FC = () => {
   const uniqueCategories = Array.from(new Set(allProducts.map(p => p.category))).sort();
   const uniqueManufacturers = Array.from(new Set(allProducts.map(p => p.manufacturer))).sort();
 
+  // --- ROOT COMPONENT --- //
+  // Assembles the main application layout, including the navbar and dynamic content.
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900">
       <Navbar 
