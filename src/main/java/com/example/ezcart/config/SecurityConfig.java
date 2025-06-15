@@ -67,6 +67,10 @@ public class SecurityConfig {
                     config.setAllowCredentials(true);
                     return config;
                 }))
+                // Enforce HTTPS for all requests.
+                // In a production environment with a reverse proxy (e.g., Nginx, AWS ELB)
+                // handling SSL termination, this might be configured differently.
+                .requiresChannel(channel -> channel.anyRequest().requiresSecure())
                 // Add the custom logging filter before the standard authentication filter.
                 .addFilterBefore(new SecurityContextLoggingFilter(), UsernamePasswordAuthenticationFilter.class)
                 // Disable CSRF protection. This is common for stateless REST APIs.
