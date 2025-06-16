@@ -1,43 +1,32 @@
-// src/main/java/com/example/ezcart/config/SecurityConfig.java
 package com.example.ezcart.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.HeaderWriterLogoutHandler;
-import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity // Enables Spring Security's web security support and provides the Spring Security integration with the Spring Web MVC.
 public class SecurityConfig {
 
-    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
+    @Value("${okta.oauth2.issuer}")
+    private String issuer;
 
-    @Value("${app.security.users:user:password:USER}")
-    private String users;
+    @Value("${okta.oauth2.client-id}")
+    private String clientId;
 
     /**
      * Configures the security filter chain.
@@ -58,7 +47,7 @@ public class SecurityConfig {
                     // Define allowed origins for your frontend applications.
                     config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:8080",
                             "http://localhost:7070", "http://localhost:9090",
-                            "http://localhost:5173", "http://localhost:8000"));
+                            "http://localhost:5173", "http://localhost:8000", "https://localhost:7443"));
                     // Define allowed HTTP methods.
                     config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     // Allow all headers.
@@ -71,108 +60,57 @@ public class SecurityConfig {
                 // In a production environment with a reverse proxy (e.g., Nginx, AWS ELB)
                 // handling SSL termination, this might be configured differently.
                 .requiresChannel(channel -> channel.anyRequest().requiresSecure())
-                // Add the custom logging filter before the standard authentication filter.
-                .addFilterBefore(new SecurityContextLoggingFilter(), UsernamePasswordAuthenticationFilter.class)
                 // Disable CSRF protection. This is common for stateless REST APIs.
                 // In a real-world application, you would likely want to configure CSRF protection.
                 .csrf(csrf -> csrf.disable())
-                // Explicitly configure the SecurityContextRepository to ensure session persistence.
-                .securityContext(context -> context
-                    .securityContextRepository(new HttpSessionSecurityContextRepository()))
-                // Configure session management to create a session if required for authentication.
-                .sessionManagement(session -> session
-                    .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                )
                 // Configure authorization rules for HTTP requests.
                 .authorizeHttpRequests(auth -> auth
-                        // Allow all requests to paths starting with /api/public/ to be publicly accessible.
-                        // This matches paths like /api/public/data, /api/public/status, etc.
-                        .requestMatchers("/public/**", "/error").permitAll()
-                        // Secure API endpoints that require authentication.
-                        .requestMatchers("/api/**").authenticated()
-                        // Allow all other requests (e.g., for serving the frontend). This is a fallback.
-                        .anyRequest().permitAll()
+                        .requestMatchers("/", "/index.html", "/static/**", "/assets/**", "/*.ico", "/*.json", "/*.png", "/public/**", "/error").permitAll()
+                        .anyRequest().authenticated()
                 )
-                // Configure HttpBasic authentication.
-                .httpBasic(httpBasic -> httpBasic
-                        .authenticationEntryPoint(new HttpStatusEntryPoint(org.springframework.http.HttpStatus.UNAUTHORIZED)))
-                // Configure logout behavior.
+                .oauth2Login(oauth2 -> oauth2
+                        // By default, Spring Security redirects to the last intercepted URL after login.
+                        // For an SPA, this can be an incorrect asset like a CSS file.
+                        // This line forces a redirect to the root, ensuring the main application page loads correctly.
+                        .defaultSuccessUrl("/", true) // Always redirect to the root after login
+                )
                 .logout(logout -> logout
-                        // Set the logout URL.
-                        .logoutUrl("/api/auth/logout")
-                        .addLogoutHandler(new HeaderWriterLogoutHandler(new ClearSiteDataHeaderWriter(ClearSiteDataHeaderWriter.Directive.ALL)))
-                        // Define a custom logout success handler.
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            // Set HTTP status to 200 (OK) on successful logout.
-                            response.setStatus(200);
-                            // Flush the writer to ensure the response is sent.
-                            response.getWriter().flush();
-                        })
-                        // Invalidate the HttpSession after logout.
+                        // Redirect to the OIDC provider's logout endpoint after the local session has been invalidated.
+                        // This is handled by a LogoutSuccessHandler to ensure local cleanup happens first.
+                        .logoutSuccessHandler(oidcLogoutSuccessHandler())
+
+                        // oauth2Login() is stateful and uses an HttpSession to store the OAuth2AuthenticationToken.
+                        // These steps are essential to invalidate the local session and clear security context.
                         .invalidateHttpSession(true)
-                        // Delete the specified cookies (e.g., JSESSIONID) after logout.
-                        .deleteCookies("JSESSIONID")
-                );
+                        .clearAuthentication(true)
+                        .deleteCookies("JSESSIONID"));
 
         return http.build();
     }
 
     /**
-     * Provides an in-memory user details service for demonstration purposes.
-     * In a production application, this would typically be backed by a database.
-     *
-     * @param passwordEncoder The PasswordEncoder to encode the user's password.
-     * @return A UserDetailsService containing the demo user.
+     * Creates a LogoutSuccessHandler that constructs the OIDC logout URL and redirects the user.
+     * This ensures a global logout by terminating the session on both the application and the identity provider.
      */
-    @Bean
-    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
-        log.info("Loading users from properties...");
-        List<UserDetails> userDetailsList = new ArrayList<>();
+    private LogoutSuccessHandler oidcLogoutSuccessHandler() {
+        return (request, response, authentication) -> {
+            String returnTo = ServletUriComponentsBuilder.fromRequest(request)
+                    .replacePath(null)
+                    .replaceQuery(null)
+                    .build()
+                    .toUriString();
 
-        // Split the users string by semicolon to get individual user definitions.
-        String[] userDefinitions = users.split(";");
+            String logoutUrl = UriComponentsBuilder
+                    .fromHttpUrl(issuer + "v2/logout")
+                    .queryParam("client_id", clientId)
+                    .queryParam("returnTo", returnTo)
+                    .encode()
+                    .toUriString();
 
-        for (String userDefinition : userDefinitions) {
-            // Split each definition by colon to get username, password, and roles.
-            String[] parts = userDefinition.split(":", 3);
-            if (parts.length == 3) {
-                String username = parts[0].trim();
-                String password = parts[1].trim();
-                String[] roles = parts[2].trim().split(",");
-
-                if (username.isEmpty() || password.isEmpty()) {
-                    log.warn("Skipping user with empty username or password: {}", userDefinition);
-                    continue;
-                }
-
-                UserDetails user = User.builder()
-                        .username(username)
-                        .password(passwordEncoder.encode(password))
-                        .roles(roles)
-                        .build();
-                userDetailsList.add(user);
-                log.info("Loaded user '{}' with roles {}", username, Arrays.toString(roles));
-            } else {
-                log.warn("Skipping malformed user entry: {}", userDefinition);
-            }
-        }
-
-        if (userDetailsList.isEmpty()) {
-            log.error("No valid users were loaded from properties. Please check the 'app.security.users' configuration.");
-            // Return a manager with no users, effectively locking the system.
-            return new InMemoryUserDetailsManager();
-        }
-
-        return new InMemoryUserDetailsManager(userDetailsList);
-    }
-
-    /**
-     * Provides a BCrypt password encoder.
-     * BCrypt is a strong hashing function recommended for storing passwords securely.
-     *
-     * @return A BCryptPasswordEncoder instance.
-     */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+            response.sendRedirect(logoutUrl);
+        };
     }
 }

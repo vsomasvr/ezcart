@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { View } from '../types'; // Import View type
 
@@ -9,8 +8,6 @@ interface NavbarProps {
   cartItemCount: number;
   onShowCartView: () => void;
   currentUser: string | null;
-  onSignOut: () => void;
-  onShowSignIn: () => void;
   currentView: View; // Added currentView prop
 }
 
@@ -21,8 +18,6 @@ const Navbar: React.FC<NavbarProps> = ({
   cartItemCount, 
   onShowCartView,
   currentUser,
-  onSignOut,
-  onShowSignIn,
   currentView // Destructure currentView
 }) => {
   const [searchInput, setSearchInput] = useState(currentSearchTerm || '');
@@ -83,26 +78,26 @@ const Navbar: React.FC<NavbarProps> = ({
             {currentUser ? (
               <>
                 <span className="text-sm text-slate-300 hidden md:block">Welcome, <span className="font-semibold text-emerald-400">{currentUser}</span></span>
-                <button
-                  onClick={onSignOut}
-                  className="bg-rose-600 hover:bg-rose-500 text-white text-sm font-semibold py-1.5 px-3 rounded-md shadow transition-colors"
+                <a
+                  href="/logout"
+                  className="bg-rose-600 hover:bg-rose-500 text-white text-sm font-semibold py-1.5 px-3 rounded-md shadow transition-colors no-underline"
                   title="Sign Out"
                   aria-label="Sign out"
                 >
                   <i className="fas fa-sign-out-alt mr-1 sm:mr-2"></i>
                   <span className="hidden sm:inline">Sign Out</span>
-                </button>
+                </a>
               </>
             ) : (
-              <button
-                onClick={onShowSignIn}
-                className="bg-sky-600 hover:bg-sky-500 text-white text-sm font-semibold py-1.5 px-3 rounded-md shadow transition-colors"
+              <a
+                href="/oauth2/authorization/okta"
+                className="bg-sky-600 hover:bg-sky-500 text-white text-sm font-semibold py-1.5 px-3 rounded-md shadow transition-colors no-underline"
                 title="Sign In"
                 aria-label="Sign in"
               >
                 <i className="fas fa-sign-in-alt mr-1 sm:mr-2"></i>
                 Sign In
-              </button>
+              </a>
             )}
             {currentView !== 'signIn' && (
               <button 

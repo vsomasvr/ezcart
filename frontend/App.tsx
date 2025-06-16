@@ -5,7 +5,6 @@ import ProductDetail from './src/components/ProductDetail';
 import LoadingSpinner from './src/components/LoadingSpinner';
 import FilterPanel from './src/components/FilterPanel';
 import CartView from './src/components/CartView';
-import SignInView from './src/components/SignInView';
 import ChatToggleButton from './src/components/ChatToggleButton';
 import ChatPanel from './src/components/ChatPanel';
 
@@ -48,11 +47,7 @@ const App: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   
   // Authentication state
-  // Stores the name of the logged-in user
-  const [currentUser, setCurrentUser] = useState<string | null>(null);
-  // Error message for the sign-in form
-  const [signInError, setSignInError] = useState<string | null>(null);
-  // Loading state specifically for authentication
+  const [currentUser, setCurrentUser] = useState<any | null>(null); // Can hold the full user object
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true); // Start true for initial check
 
   // Chat state
@@ -71,22 +66,32 @@ const App: React.FC = () => {
   // --- INITIALIZATION EFFECT --- //
   // This effect runs once when the App component mounts to fetch essential data.
   useEffect(() => {
-    // 1. Checks for an active user session on the backend.
-    const checkCurrentUser = async () => {
+    const initializeApp = async () => {
+      setIsLoading(true);
+      setIsAuthLoading(true);
       try {
-        const user = await authService.getCurrentUser();
+        // Fetch user and products in parallel for faster loading.
+        const [user, products] = await Promise.all([
+          authService.getCurrentUser(),
+          getProducts()
+        ]);
+
         if (user) {
-          setCurrentUser(user); // If a session exists, set the current user.
+          setCurrentUser(user);
         }
+        setAllProducts(products);
+        setDisplayedProducts(products); // Initially, display all products
+
       } catch (err) {
-        setCurrentUser(null); // On failure, ensure no user is set.
+        console.error("Initialization failed:", err);
+        setError('Failed to load application data. Please try again later.');
       } finally {
-        setIsAuthLoading(false); // Authentication check is complete.
+        setIsLoading(false);
+        setIsAuthLoading(false);
       }
     };
 
-    // Trigger both asynchronous operations on startup.
-    checkCurrentUser();
+    initializeApp();
   }, []);
 
   // --- CART DATA EFFECT --- //
@@ -105,13 +110,14 @@ const App: React.FC = () => {
           setIsLoading(false);
         }
       } else {
-        // If there's no user, the cart is empty.
         setCartItems([]);
       }
     };
 
-    loadCart();
-  }, [currentUser]);
+    if (!isAuthLoading) { // Only run after initial auth check
+      loadCart();
+    }
+  }, [currentUser, isAuthLoading]);
 
   // --- CHAT DATA EFFECT --- //
   // This effect loads the user's chat history from the backend when they log in.
@@ -141,34 +147,6 @@ const App: React.FC = () => {
       window.scrollTo(0, 0);
     });
   }, [currentView, selectedProductId]);
-
-  // Load products on component mount or when filters change
-  // This is a React useEffect hook. The code inside it runs after the component renders.
-  //  The [isServerFiltering] part is the "dependency array."
-  //  It tells React to re-run this effect automatically whenever the value of isServerFiltering changes.
-  //  This allows the component to react to changes in how filtering is handled.
-  useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        setIsLoading(true);
-        // Only load all products if we're not using server-side filtering
-        if (!isServerFiltering || allProducts.length === 0) {
-          const products = await getProducts();
-          setAllProducts(products);
-          if (!isServerFiltering) {
-            setDisplayedProducts(products);
-          }
-        }
-      } catch (error) {
-        setError('Failed to load products. Please try again later.');
-        console.error('Error loading products:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadProducts();
-  }, [isServerFiltering]);
 
   const applyFilters = useCallback(async () => {
     if (allProducts.length === 0) {
@@ -286,7 +264,6 @@ const App: React.FC = () => {
   const handleShowList = () => {
     setCurrentView('list');
     setSelectedProductId(null);
-    setSignInError(null);
   };
   
   const handleKeywordSearch = (keyword: string) => {
@@ -350,55 +327,6 @@ const App: React.FC = () => {
     setCurrentView('cart');
   };
 
-  const handleShowSignInView = () => {
-    setSignInError(null);
-    setCurrentView('signIn');
-  };
-
-  const handleSignIn = async (username, password) => {
-    setIsAuthLoading(true);
-    setSignInError(null);
-    try {
-      const user = await authService.login(username, password);
-      setCurrentUser(user);
-      setCurrentView('list');
-      loadProducts();
-    } catch (err) {
-      setSignInError('Invalid username or password.');
-    } finally {
-      setIsAuthLoading(false);
-    }
-  };
-
-  const loadProducts = async () => {
-    try {
-      setIsLoading(true);
-      const products = await getProducts();
-      setAllProducts(products); // Store the master product list.
-      setDisplayedProducts(products); // Initially, display all products.
-    } catch (error) {
-      setError('Failed to load products. Please try again later.');
-    } finally {
-      setIsLoading(false); // Product loading is complete.
-    }
-  };
-
-  
-  const handleSignOut = async () => {
-    try {
-      await authService.logout();
-    } catch (error) {
-      console.error('Logout failed:', error);
-      // Optionally, you could show an error message to the user here.
-    } finally {
-      setCurrentUser(null);
-      setIsChatPanelOpen(false);
-      setChatMessages([]);
-      handleShowList();
-      window.location.reload();
-    }
-  };
-
   const detailedCartItems: DetailedCartItem[] = useMemo(() => {
     return cartItems.map(cartItem => {
       const product = allProducts.find(p => p.productId === cartItem.productId);
@@ -433,16 +361,20 @@ const App: React.FC = () => {
     setChatMessages(prev => [...prev, optimisticUserMessage]);
 
     try {
-      // Send the message and wait for the AI response.
-      await chatService.sendMessage(messageText);
-      // After the backend confirms, refresh the entire history to ensure consistency.
-      const updatedHistory = await chatService.getHistory();
-      setChatMessages(updatedHistory);
+      const botMessage = await chatService.sendMessage(messageText);
+      // Replace the optimistic message with the confirmed one from the server if needed,
+      // or simply add the bot's response.
+      setChatMessages(prev => [...prev, botMessage]);
     } catch (error) {
       console.error('Failed to send message:', error);
-      setError('Could not send your message. Please try again.');
-      // On failure, remove the optimistic message.
-      setChatMessages(prev => prev.filter(m => m.id !== optimisticUserMessage.id));
+      // Create a specific error message for the chat
+      const errorMessage: ChatMessage = {
+        id: `err-${Date.now()}`,
+        sender: 'bot',
+        text: 'Sorry, I am having trouble connecting. Please try again later.',
+        timestamp: new Date().toISOString(),
+      };
+      setChatMessages(prev => [...prev, errorMessage]);
     }
   };
 
@@ -454,41 +386,6 @@ const App: React.FC = () => {
       return <LoadingSpinner />;
     }
 
-    // Render the sign-in page.
-    if (currentView === 'signIn') {
-        return <SignInView 
-                    onSignIn={handleSignIn} 
-                    onCancel={handleShowList} 
-                    error={signInError} 
-                    isLoading={isAuthLoading}
-                />;
-    }
-    
-    // Render the product detail page.
-    if (currentView === 'detail') {
-      if (selectedProductId) {
-        return <ProductDetail 
-                  productId={selectedProductId} 
-                  onBack={handleShowList} 
-                  onAddToCart={handleAddToCart} 
-                  cartItems={cartItems}
-                />;
-      }
-      handleShowList(); 
-      return <LoadingSpinner />;
-    }
-
-    // Render the cart view.
-    if (currentView === 'cart') { 
-        return <CartView
-            cartItems={detailedCartItems}
-            onRemoveItem={handleRemoveFromCart}
-            onUpdateQuantity={handleUpdateCartQuantity}
-            onClearCart={handleClearCart}
-            onBackToList={handleShowList}
-        />;
-    }
-    
     // Initial loading state before any products are fetched
     if (isLoading && allProducts.length === 0 && !error) { 
         return <LoadingSpinner />;
@@ -520,12 +417,35 @@ const App: React.FC = () => {
     }
 
     // Default: show product list
-    return <ProductList 
-              products={displayedProducts} 
-              onProductSelect={handleProductSelect} 
-              onAddToCart={handleAddToCart}
-              cartItems={cartItems}
-            />;
+    if (currentView === 'list') {
+      return <ProductList 
+                products={displayedProducts} 
+                onProductSelect={handleProductSelect} 
+                onAddToCart={handleAddToCart}
+                cartItems={cartItems}
+              />;
+    }
+
+    // Render the product detail page.
+    if (currentView === 'detail' && selectedProductId) {
+      return <ProductDetail 
+                productId={selectedProductId} 
+                onBack={handleShowList} 
+                onAddToCart={handleAddToCart}
+                cartItems={cartItems}
+              />;
+    }
+
+    // Render the cart view.
+    if (currentView === 'cart') { 
+        return <CartView
+            cartItems={detailedCartItems}
+            onBackToList={handleShowList}
+            onRemoveItem={handleRemoveFromCart}
+            onUpdateQuantity={handleUpdateCartQuantity}
+            onClearCart={handleClearCart}
+        />;
+    }
   };
   
   const uniqueCategories = Array.from(new Set(allProducts.map(p => p.category))).sort();
@@ -536,15 +456,13 @@ const App: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900">
       <Navbar 
-        onShowList={handleShowList} 
-        onSearch={handleKeywordSearch} 
+        onShowList={handleShowList}
+        onSearch={handleKeywordSearch}
         currentSearchTerm={activeFilters.keyword}
         cartItemCount={totalCartQuantity}
         onShowCartView={handleShowCartView}
-        currentUser={currentUser} 
-        onSignOut={handleSignOut}
-        onShowSignIn={handleShowSignInView}
-        currentView={currentView} // Pass currentView to Navbar
+        currentUser={currentUser ? currentUser.name : null}
+        currentView={currentView}
       />
       <main className="flex-grow container mx-auto px-2 sm:px-4 py-8 relative">
         {currentView === 'list' && allProducts.length > 0 && (
@@ -567,7 +485,6 @@ const App: React.FC = () => {
             onClose={toggleChatPanel}
             messages={chatMessages}
             onSendMessage={handleSendMessage}
-            currentUser={currentUser}
           />
         </>
       )}
