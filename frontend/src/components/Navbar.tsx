@@ -90,7 +90,7 @@ const Navbar: React.FC<NavbarProps> = ({
               </>
             ) : (
               <a
-                href="/oauth2/authorization/okta"
+                href="/oauth2/authorization/ezcart-web"
                 className="bg-sky-600 hover:bg-sky-500 text-white text-sm font-semibold py-1.5 px-3 rounded-md shadow transition-colors no-underline"
                 title="Sign In"
                 aria-label="Sign in"
