@@ -59,7 +59,7 @@ public class SecurityConfig {
                 // Enforce HTTPS for all requests.
                 // In a production environment with a reverse proxy (e.g., Nginx, AWS ELB)
                 // handling SSL termination, this might be configured differently.
-                .requiresChannel(channel -> channel.anyRequest().requiresSecure())
+//                .requiresChannel(channel -> channel.anyRequest().requiresSecure())
                 // Disable CSRF protection. This is common for stateless REST APIs.
                 // In a real-world application, you would likely want to configure CSRF protection.
                 .csrf(csrf -> csrf.disable())
@@ -78,39 +78,13 @@ public class SecurityConfig {
                         .defaultSuccessUrl("/", true) // Always redirect to the root after login
                 )
                 .logout(logout -> logout
-                        // Redirect to the OIDC provider's logout endpoint after the local session has been invalidated.
-                        // This is handled by a LogoutSuccessHandler to ensure local cleanup happens first.
-                        .logoutSuccessHandler(oidcLogoutSuccessHandler())
-
                         // oauth2Login() is stateful and uses an HttpSession to store the OAuth2AuthenticationToken.
                         // These steps are essential to invalidate the local session and clear security context.
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
-                        .deleteCookies("JSESSIONID"));
+                        .deleteCookies("JSESSIONID")
+                );
 
         return http.build();
-    }
-
-    /**
-     * Creates a LogoutSuccessHandler that constructs the OIDC logout URL and redirects the user.
-     * This ensures a global logout by terminating the session on both the application and the identity provider.
-     */
-    private LogoutSuccessHandler oidcLogoutSuccessHandler() {
-        return (request, response, authentication) -> {
-            String returnTo = ServletUriComponentsBuilder.fromRequest(request)
-                    .replacePath(null)
-                    .replaceQuery(null)
-                    .build()
-                    .toUriString();
-
-            String logoutUrl = UriComponentsBuilder
-                    .fromHttpUrl(issuer + "v2/logout")
-                    .queryParam("client_id", clientId)
-                    .queryParam("returnTo", returnTo)
-                    .encode()
-                    .toUriString();
-
-            response.sendRedirect(logoutUrl);
-        };
     }
 }
