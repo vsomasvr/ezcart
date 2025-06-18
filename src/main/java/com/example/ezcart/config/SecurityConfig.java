@@ -29,7 +29,7 @@ public class SecurityConfig {
     @Autowired
     private ClientRegistrationRepository clientRegistrationRepository;
 
-    @Value("${okta.post-logout-redirect-uri}")
+    @Value("${okta.ezcart-web.post-logout-redirect-uri}")
     private String postLogoutRedirectUri;
 
     /**

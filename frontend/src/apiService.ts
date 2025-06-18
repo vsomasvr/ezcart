@@ -9,6 +9,18 @@ api.interceptors.request.use(config => {
   return config;
 });
 
+// Add a response interceptor to handle 401 errors
+api.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response && error.response.status === 401) {
+      // Dispatch a custom event to notify the app of authentication failure
+      window.dispatchEvent(new Event('auth-error'));
+    }
+    return Promise.reject(error);
+  }
+);
+
 export async function getProducts(): Promise<Product[]> {
   try {
     const response = await api.get<Product[]>('/catalog/products');

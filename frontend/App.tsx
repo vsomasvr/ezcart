@@ -94,6 +94,32 @@ const App: React.FC = () => {
     initializeApp();
   }, []);
 
+  // --- AUTH ERROR EFFECT --- //
+  // This effect listens for a global 'auth-error' event dispatched by the API service interceptor.
+  useEffect(() => {
+    const handleAuthError = () => {
+      console.log("Authentication error detected, signing out and clearing user data.");
+      setCurrentUser(prevUser => {
+        // Only clear data if a user was actually logged in to prevent unnecessary re-renders.
+        if (prevUser !== null) {
+          setCartItems([]);
+          setAllProducts([]);
+          setDisplayedProducts([]);
+          setActiveFilters(initialFilters);
+          return null; // Log out the user
+        }
+        return prevUser; // No change if already logged out
+      });
+    };
+
+    window.addEventListener('auth-error', handleAuthError);
+
+    // Cleanup the event listener when the component unmounts
+    return () => {
+      window.removeEventListener('auth-error', handleAuthError);
+    };
+  }, []); // Empty dependency array is correct here because the updater function gets the latest state.
+
   // --- CART DATA EFFECT --- //
   // This effect synchronizes the cart state with the backend whenever the user logs in or out.
   useEffect(() => {
