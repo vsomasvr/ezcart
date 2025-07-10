@@ -185,7 +185,7 @@ public class AuthenticationService {
         }
     }
 }
-
+```
 ---
 
 # React Frontend Style Guide
@@ -363,3 +363,4 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, onProfileLoaded }) =>
 };
 
 export default UserProfile;
+```
