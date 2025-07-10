@@ -1,13 +1,25 @@
 package com.example.ezcart.service;
 
 import com.example.ezcart.domain.ChatMessage;
+import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -23,42 +35,77 @@ public class ChatService {
     //    new copy of the list, making read operations lock-free and very fast.
     // This modern approach is less verbose and well-suited for the simpler, append-style
     // operations of a chat system.
+    private static final Logger log = LoggerFactory.getLogger(ChatService.class);
     private final Map<String, List<ChatMessage>> chatHistories = new ConcurrentHashMap<>();
+    private final WebClient webClient;
+    private final OAuth2AuthorizedClientManager authorizedClientManager;
+    private final OAuth2AuthorizedClientRepository authorizedClientRepository;
 
-    /**
-     * Retrieves the chat history for a specific user.
-     *
-     * @param userId The ID of the user whose chat history is being requested.
-     * @return A list of chat messages, or an empty list if none exists.
-     */
+    @Autowired
+    public ChatService(WebClient webClient, OAuth2AuthorizedClientManager authorizedClientManager, OAuth2AuthorizedClientRepository authorizedClientRepository) {
+        this.webClient = webClient;
+        this.authorizedClientManager = authorizedClientManager;
+        this.authorizedClientRepository = authorizedClientRepository;
+    }
+
     public List<ChatMessage> getChatHistory(String userId) {
         return chatHistories.getOrDefault(userId, Collections.emptyList());
     }
 
-    /**
-     * Adds a user's message to their history and generates a placeholder AI response.
-     *
-     * @param userId The ID of the user sending the message.
-     * @param userMessage The message sent by the user.
-     * @return The generated AI response message.
-     */
     public ChatMessage addMessage(String userId, ChatMessage userMessage) {
         // Use CopyOnWriteArrayList for thread-safe list modifications.
         // This is efficient when reads are more frequent than writes.
-        chatHistories.putIfAbsent(userId, new CopyOnWriteArrayList<>());
+        chatHistories.computeIfAbsent(userId, k -> new CopyOnWriteArrayList<>()).add(userMessage);
 
-        List<ChatMessage> userChatHistory = chatHistories.get(userId);
-        userChatHistory.add(userMessage);
+        // This is the core logic for the manual token exchange
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (!(requestAttributes instanceof ServletRequestAttributes)) {
+            throw new IllegalStateException("Current request is not a servlet request.");
+        }
+        HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
+        Authentication authentication = (Authentication) request.getUserPrincipal();
 
-        // Simulate an AI response and add it to the history.
-        ChatMessage aiResponse = new ChatMessage(
-            UUID.randomUUID().toString(),
-            "Thanks for your message! I'm a placeholder AI and I'm processing your request.",
-            "ai",
-            Instant.now()
+        // 1. Load the authorized client from the HTTP session
+        OAuth2AuthorizedClient initialAuthorizedClient = this.authorizedClientRepository.loadAuthorizedClient(
+                "ezcart-web", authentication, request);
+
+        if (initialAuthorizedClient == null) {
+            throw new IllegalStateException("Could not find authorized client for 'ezcart-web'. User may not be logged in.");
+        }
+
+        // 2. Create the special principal with the subject token
+        OAuth2AccessToken subjectToken = initialAuthorizedClient.getAccessToken();
+        Authentication principalWithToken = new UsernamePasswordAuthenticationToken(subjectToken, null, authentication.getAuthorities());
+
+        // 3. Build the request for the token exchange
+        OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest
+                .withClientRegistrationId("ezcart-backend")
+                .principal(principalWithToken)
+                .build();
+
+        // 4. Perform the token exchange
+        OAuth2AuthorizedClient exchangedClient = this.authorizedClientManager.authorize(authorizeRequest);
+        if (exchangedClient == null) {
+            throw new IllegalStateException("Token exchange failed. Could not authorize the 'ezcart-backend' client.");
+        }
+        String exchangedTokenValue = exchangedClient.getAccessToken().getTokenValue();
+
+        // 5. Make the final call with the manual Authorization header
+        ChatMessage aiResponseText = webClient.post()
+                .uri("/api/ai/execute")
+                .headers(headers -> headers.setBearerAuth(exchangedTokenValue))
+                .bodyValue(userMessage.text())
+                .retrieve()
+                .bodyToMono(ChatMessage.class)
+                .block();
+
+        ChatMessage aiMessage = new ChatMessage(
+                java.util.UUID.randomUUID().toString(),
+                Objects.requireNonNull(aiResponseText).text(),
+                "ai",
+                Instant.now()
         );
-        userChatHistory.add(aiResponse);
-
-        return aiResponse;
+        chatHistories.get(userId).add(aiMessage);
+        return aiMessage;
     }
 }
